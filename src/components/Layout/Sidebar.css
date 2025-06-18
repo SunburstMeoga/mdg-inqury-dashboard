@@ -1,0 +1,64 @@
+.app-sidebar {
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06);
+  position: relative;
+  z-index: 5;
+}
+
+.app-sidebar .ant-layout-sider-trigger {
+  background-color: #004EA2;
+  color: white;
+  border-top: 1px solid #e8e8e8;
+}
+
+.app-sidebar .ant-layout-sider-trigger:hover {
+  background-color: #0066CC;
+}
+
+.sidebar-menu {
+  border-right: none;
+  padding-top: 16px;
+}
+
+.sidebar-menu .ant-menu-item {
+  margin: 4px 12px;
+  border-radius: 6px;
+  height: 48px;
+  line-height: 48px;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-menu .ant-menu-item:hover {
+  background-color: #f0f7ff;
+  color: #004EA2;
+}
+
+.sidebar-menu .ant-menu-item-selected {
+  background-color: #004EA2 !important;
+  color: white !important;
+}
+
+.sidebar-menu .ant-menu-item-selected:hover {
+  background-color: #0066CC !important;
+}
+
+.sidebar-menu .ant-menu-item-selected .anticon {
+  color: white;
+}
+
+.sidebar-menu .ant-menu-item .anticon {
+  font-size: 16px;
+  margin-right: 12px;
+}
+
+/* 折叠状态下的样式 */
+.app-sidebar.ant-layout-sider-collapsed .sidebar-menu .ant-menu-item {
+  margin: 4px 8px;
+  padding: 0 !important;
+  justify-content: center;
+}
+
+.app-sidebar.ant-layout-sider-collapsed .sidebar-menu .ant-menu-item .anticon {
+  margin-right: 0;
+  font-size: 18px;
+}

@@ -1,0 +1,65 @@
+.pre-surgery-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 500px;
+}
+
+.development-card {
+  width: 100%;
+  max-width: 500px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e8e8e8;
+}
+
+.development-content {
+  padding: 60px 40px;
+  text-align: center;
+}
+
+.development-icon {
+  font-size: 80px;
+  color: #004EA2;
+  opacity: 0.8;
+}
+
+.development-title {
+  color: #333;
+  margin: 0;
+}
+
+.development-subtitle {
+  color: #004EA2;
+  margin: 0;
+  font-weight: 600;
+}
+
+.development-description {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .development-content {
+    padding: 40px 24px;
+  }
+  
+  .development-icon {
+    font-size: 60px;
+  }
+  
+  .development-title {
+    font-size: 24px;
+  }
+  
+  .development-subtitle {
+    font-size: 18px;
+  }
+  
+  .development-description {
+    font-size: 14px;
+  }
+}
