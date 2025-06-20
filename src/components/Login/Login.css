@@ -34,10 +34,11 @@
 }
 
 .login-logo {
-  width: 80px;
-  height: 80px;
+  max-width: 80px;
+  max-height: 80px;
   margin-bottom: 16px;
-  border-radius: 8px;
+  object-fit: contain;
+  /* 移除border-radius以避免裁剪图片 */
 }
 
 .login-title {
@@ -92,7 +93,7 @@
     padding: 24px;
     margin: 20px;
   }
-  
+
   .login-title {
     font-size: 20px;
   }

@@ -54,6 +54,21 @@ html, body {
   background: #a8a8a8;
 }
 
+/* 图片通用样式 - 保持宽高比 */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Ant Design Image组件样式 */
+.ant-image {
+  display: inline-block;
+}
+
+.ant-image img {
+  object-fit: contain;
+}
+
 /* 响应式断点 */
 @media (max-width: 768px) {
   .ant-card {

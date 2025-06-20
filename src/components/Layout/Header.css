@@ -15,10 +15,11 @@
 }
 
 .header-logo {
-  width: 40px;
-  height: 40px;
+  max-width: 40px;
+  max-height: 40px;
   margin-right: 12px;
-  border-radius: 6px;
+  object-fit: contain;
+  /* 移除border-radius以避免裁剪图片 */
 }
 
 .header-title {
@@ -88,15 +89,15 @@
   .app-header {
     padding: 0 16px;
   }
-  
+
   .header-title {
     font-size: 16px;
   }
-  
+
   .hospital-area {
     display: none;
   }
-  
+
   .user-details {
     display: none;
   }
