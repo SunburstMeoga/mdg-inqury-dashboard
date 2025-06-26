@@ -3,10 +3,12 @@ import { Layout, Menu } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   FileTextOutlined,
-  ScissorOutlined,
-  EyeOutlined
+  BarChartOutlined,
+  TeamOutlined,
+  LockOutlined
 } from '@ant-design/icons';
-
+import { useAuth } from '../../context/AuthContext';
+import { MENU_ITEMS } from '../../utils/constants';
 import './Sidebar.css';
 
 const { Sider } = Layout;
@@ -14,35 +16,46 @@ const { Sider } = Layout;
 const Sidebar = ({ collapsed, onCollapse }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { hasPermission, isAdmin } = useAuth();
 
-  const menuItems = [
-    {
-      key: 'pre-consultation',
-      icon: <FileTextOutlined />,
-      label: '预问诊',
-      onClick: () => navigate('/pre-consultation')
-    },
-    {
-      key: 'pre-surgery',
-      icon: <ScissorOutlined />,
-      label: '术前分析',
-      onClick: () => navigate('/pre-surgery')
-    },
-    {
-      key: 'orthok',
-      icon: <EyeOutlined />,
-      label: '塑形镜分析',
-      onClick: () => navigate('/orthok')
-    }
-  ];
+  // 图标映射
+  const iconMap = {
+    consultations: <FileTextOutlined />,
+    statistics: <BarChartOutlined />,
+    doctors: <TeamOutlined />,
+    password: <LockOutlined />
+  };
+
+  // 过滤菜单项（根据权限）
+  const getFilteredMenuItems = () => {
+    return MENU_ITEMS.filter(item => {
+      // 检查管理员权限
+      if (item.adminOnly && !isAdmin) {
+        return false;
+      }
+
+      // 检查具体权限
+      if (item.permission) {
+        return hasPermission(item.permission.action, item.permission.subject);
+      }
+
+      return true;
+    }).map(item => ({
+      key: item.key,
+      icon: iconMap[item.key],
+      label: item.label,
+      onClick: () => navigate(item.path)
+    }));
+  };
 
   // 根据当前路径确定选中的菜单项
   const getSelectedKey = () => {
     const path = location.pathname;
-    if (path.includes('pre-consultation')) return 'pre-consultation';
-    if (path.includes('pre-surgery')) return 'pre-surgery';
-    if (path.includes('orthok')) return 'orthok';
-    return 'pre-consultation'; // 默认选中预问诊
+    if (path.includes('consultations')) return 'consultations';
+    if (path.includes('statistics')) return 'statistics';
+    if (path.includes('doctors')) return 'doctors';
+    if (path.includes('password')) return 'password';
+    return 'consultations'; // 默认选中预问诊记录
   };
 
   return (
@@ -58,7 +71,7 @@ const Sidebar = ({ collapsed, onCollapse }) => {
       <Menu
         mode="inline"
         selectedKeys={[getSelectedKey()]}
-        items={menuItems}
+        items={getFilteredMenuItems()}
         className="sidebar-menu"
       />
     </Sider>

@@ -1,0 +1,195 @@
+.statistics-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  height: 100%;
+}
+
+.filter-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.filter-header {
+  margin-bottom: 24px;
+}
+
+.filter-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.statistics-content {
+  flex: 1;
+}
+
+.stat-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card .ant-statistic-title {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.stat-card .ant-statistic-content {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.completion-card,
+.organization-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.completion-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.completion-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+}
+
+.completion-label {
+  font-size: 14px;
+  color: #666;
+}
+
+.completion-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: #004EA2;
+}
+
+.organization-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.organization-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+}
+
+.organization-name {
+  font-size: 14px;
+  color: #333;
+}
+
+.organization-count {
+  font-size: 14px;
+  font-weight: 500;
+  color: #004EA2;
+}
+
+.date-info-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.date-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #666;
+}
+
+.date-range {
+  font-weight: 500;
+  color: #004EA2;
+}
+
+.no-data-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-data {
+  text-align: center;
+  color: #999;
+}
+
+.no-data p {
+  margin-top: 16px;
+  font-size: 16px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .statistics-page {
+    gap: 16px;
+  }
+  
+  .filter-container {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .filter-container .ant-picker,
+  .filter-container .ant-select {
+    width: 100% !important;
+  }
+  
+  .stat-card .ant-statistic-content {
+    font-size: 20px;
+  }
+  
+  .completion-item {
+    padding: 8px 12px;
+  }
+  
+  .completion-value {
+    font-size: 16px;
+  }
+  
+  .organization-item {
+    padding: 6px 10px;
+  }
+}
+
+/* 滚动条样式 */
+.organization-stats::-webkit-scrollbar {
+  width: 4px;
+}
+
+.organization-stats::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.organization-stats::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 2px;
+}
+
+.organization-stats::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

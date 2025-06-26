@@ -1,0 +1,84 @@
+.doctors-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  height: 100%;
+}
+
+.filter-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.filter-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.table-card {
+  flex: 1;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.doctors-table .ant-table-thead > tr > th {
+  background-color: #fafafa;
+  font-weight: 600;
+  color: #333;
+}
+
+.doctors-table .ant-table-tbody > tr:hover > td {
+  background-color: #f5f7fa;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .doctors-page {
+    gap: 16px;
+  }
+  
+  .filter-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .filter-container {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .filter-container .ant-input-search {
+    width: 100% !important;
+  }
+  
+  .doctors-table {
+    font-size: 12px;
+  }
+}
+
+/* 表格滚动条样式 */
+.doctors-table .ant-table-body::-webkit-scrollbar {
+  height: 6px;
+}
+
+.doctors-table .ant-table-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.doctors-table .ant-table-body::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.doctors-table .ant-table-body::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

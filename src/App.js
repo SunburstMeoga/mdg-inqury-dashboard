@@ -1,13 +1,14 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, App as AntdApp } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './components/Login/Login';
 import MainLayout from './components/Layout/MainLayout';
-import PreConsultation from './pages/PreConsultation/PreConsultation';
-import PreSurgery from './pages/PreSurgery/PreSurgery';
-import OrthoK from './pages/OrthoK/OrthoK';
+import Consultations from './pages/Consultations/Consultations';
+import Statistics from './pages/Statistics/Statistics';
+import Doctors from './pages/Doctors/Doctors';
+import Password from './pages/Password/Password';
 import { THEME_COLOR } from './utils/constants';
 import './App.css';
 
@@ -30,7 +31,7 @@ const PublicRoute = ({ children }) => {
     return <div>Loading...</div>;
   }
 
-  return !isAuthenticated ? children : <Navigate to="/pre-consultation" replace />;
+  return !isAuthenticated ? children : <Navigate to="/consultations" replace />;
 };
 
 function App() {
@@ -43,48 +44,53 @@ function App() {
         },
       }}
     >
-      <AuthProvider>
-        <Router>
-          <div className="App">
-            <Routes>
-              {/* 登录页面 */}
-              <Route
-                path="/login"
-                element={
-                  <PublicRoute>
-                    <Login />
-                  </PublicRoute>
-                }
-              />
+      <AntdApp>
+        <AuthProvider>
+          <Router>
+            <div className="App">
+              <Routes>
+                {/* 登录页面 */}
+                <Route
+                  path="/login"
+                  element={
+                    <PublicRoute>
+                      <Login />
+                    </PublicRoute>
+                  }
+                />
 
-              {/* 主应用路由 */}
-              <Route
-                path="/"
-                element={
-                  <PrivateRoute>
-                    <MainLayout />
-                  </PrivateRoute>
-                }
-              >
-                {/* 默认重定向到预问诊 */}
-                <Route index element={<Navigate to="/pre-consultation" replace />} />
+                {/* 主应用路由 */}
+                <Route
+                  path="/"
+                  element={
+                    <PrivateRoute>
+                      <MainLayout />
+                    </PrivateRoute>
+                  }
+                >
+                  {/* 默认重定向到预问诊记录 */}
+                  <Route index element={<Navigate to="/consultations" replace />} />
 
-                {/* 预问诊页面 */}
-                <Route path="pre-consultation" element={<PreConsultation />} />
+                  {/* 预问诊记录页面 */}
+                  <Route path="consultations" element={<Consultations />} />
 
-                {/* 术前分析页面 */}
-                <Route path="pre-surgery" element={<PreSurgery />} />
+                  {/* 统计分析页面 */}
+                  <Route path="statistics" element={<Statistics />} />
 
-                {/* 塑形镜分析页面 */}
-                <Route path="orthok" element={<OrthoK />} />
-              </Route>
+                  {/* 账号管理页面 */}
+                  <Route path="doctors" element={<Doctors />} />
 
-              {/* 404页面重定向 */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </div>
-        </Router>
-      </AuthProvider>
+                  {/* 密码管理页面 */}
+                  <Route path="password" element={<Password />} />
+                </Route>
+
+                {/* 404页面重定向 */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </div>
+          </Router>
+        </AuthProvider>
+      </AntdApp>
     </ConfigProvider>
   );
 }

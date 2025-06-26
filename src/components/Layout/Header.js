@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Layout, Avatar, Dropdown, Button, Space, Typography } from 'antd';
-import { UserOutlined, LogoutOutlined, PlusOutlined } from '@ant-design/icons';
+import { Layout, Avatar, Dropdown, Space, Typography, Modal, message } from 'antd';
+import { UserOutlined, LogoutOutlined, LockOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
-import { PROJECT_NAME, LOGO_URL, USER_ROLE_NAMES } from '../../utils/constants';
-import Register from '../Register/Register';
+import { PROJECT_NAME, LOGO_URL, ORGANIZATION_TYPES } from '../../utils/constants';
+import ChangePassword from '../ChangePassword/ChangePassword';
 import './Header.css';
 
 const { Header: AntHeader } = Layout;
@@ -11,21 +11,41 @@ const { Text } = Typography;
 
 const Header = () => {
   const { user, logout, isAdmin } = useAuth();
-  const [registerVisible, setRegisterVisible] = useState(false);
+  const [changePasswordVisible, setChangePasswordVisible] = useState(false);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    Modal.confirm({
+      title: '确认退出',
+      content: '确定要退出登录吗？',
+      okText: '确定',
+      cancelText: '取消',
+      onOk: async () => {
+        const result = await logout();
+        if (result.success) {
+          message.success(result.message || '已成功退出登录');
+        } else {
+          message.error(result.message || '退出失败');
+        }
+      }
+    });
   };
 
-  const handleRegister = () => {
-    setRegisterVisible(true);
+  const handleChangePassword = () => {
+    setChangePasswordVisible(true);
   };
 
   const userMenuItems = [
     {
       key: 'profile',
-      icon: <UserOutlined />,
+      icon: <InfoCircleOutlined />,
       label: '个人信息',
+      disabled: true // 暂时禁用，后续可以添加个人信息页面
+    },
+    {
+      key: 'change-password',
+      icon: <LockOutlined />,
+      label: '修改密码',
+      onClick: handleChangePassword,
     },
     {
       type: 'divider',
@@ -45,22 +65,13 @@ const Header = () => {
           <img src={LOGO_URL} alt="Logo" className="header-logo" />
           <span className="header-title">{PROJECT_NAME}</span>
         </div>
-        
+
         <div className="header-right">
           <Space size="middle">
-            {isAdmin && (
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={handleRegister}
-                size="small"
-              >
-                注册用户
-              </Button>
-            )}
-            
             <div className="user-info">
-              <Text className="hospital-area">{user?.hospitalArea}</Text>
+              <Text className="organization-info">
+                {user?.organization?.name} ({ORGANIZATION_TYPES[user?.organization?.type] || '未知类型'})
+              </Text>
               <Dropdown
                 menu={{ items: userMenuItems }}
                 placement="bottomRight"
@@ -74,7 +85,10 @@ const Header = () => {
                   />
                   <div className="user-details">
                     <Text className="user-name">{user?.name}</Text>
-                    <Text className="user-role">{USER_ROLE_NAMES[user?.role]}</Text>
+                    <Text className="user-role">
+                      {isAdmin ? '管理员' : '医生'}
+                      {user?.is_active === false && ' (已禁用)'}
+                    </Text>
                   </div>
                 </div>
               </Dropdown>
@@ -83,10 +97,10 @@ const Header = () => {
         </div>
       </AntHeader>
 
-      <Register
-        visible={registerVisible}
-        onCancel={() => setRegisterVisible(false)}
-        onSuccess={() => setRegisterVisible(false)}
+      <ChangePassword
+        visible={changePasswordVisible}
+        onCancel={() => setChangePasswordVisible(false)}
+        onSuccess={() => setChangePasswordVisible(false)}
       />
     </>
   );
