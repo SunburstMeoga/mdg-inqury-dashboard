@@ -6,6 +6,7 @@ import {
   Tag,
   Button,
   Input,
+  Select,
   message,
   Modal,
   Typography,
@@ -25,6 +26,7 @@ import DoctorForm from './DoctorForm';
 import './Doctors.css';
 
 const { Search } = Input;
+const { Option } = Select;
 const { Title, Text } = Typography;
 
 const Doctors = () => {
@@ -32,6 +34,10 @@ const Doctors = () => {
   const [doctors, setDoctors] = useState([]);
   const [total, setTotal] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedOrgId, setSelectedOrgId] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [organizations, setOrganizations] = useState([]);
+  const [organizationsLoading, setOrganizationsLoading] = useState(false);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: PAGINATION_CONFIG.DEFAULT_PAGE_SIZE
@@ -41,45 +47,50 @@ const Doctors = () => {
 
   const { isAdmin } = useAuth();
 
+  // 加载组织列表
+  const loadOrganizations = async () => {
+    setOrganizationsLoading(true);
+    try {
+      const result = await ApiService.getOrganizationList({ MaxResultCount: 200 });
+      if (result.success) {
+        setOrganizations(result.data || []);
+      } else {
+        message.error(result.message || '加载组织列表失败');
+      }
+    } catch (error) {
+      message.error('加载组织列表失败');
+    } finally {
+      setOrganizationsLoading(false);
+    }
+  };
+
   // 加载医生列表
   const loadDoctors = async () => {
     setLoading(true);
     try {
       const params = {
         page: pagination.current,
-        per_page: pagination.pageSize,
-        ...(searchTerm && { search: searchTerm })
+        perPage: pagination.pageSize,
+        ...(searchTerm && { q: searchTerm }),
+        ...(selectedOrgId && { org_id: selectedOrgId }),
+        ...(selectedStatus !== '' && { is_active: selectedStatus === 'active' })
       };
 
-      // 获取所有用户（医生和咨询师）
-      const [doctorResult, counselorResult] = await Promise.all([
-        ApiService.getDoctorList(params),
-        ApiService.getCounselorList(params)
-      ]);
+      // 使用新的医生列表API
+      const result = await ApiService.getDoctorList(params);
 
-      let allUsers = [];
-      let totalCount = 0;
-
-      if (doctorResult.success) {
-        allUsers = [...allUsers, ...(doctorResult.data || [])];
-        totalCount += doctorResult.total || 0;
-      }
-
-      if (counselorResult.success) {
-        allUsers = [...allUsers, ...(counselorResult.data || [])];
-        totalCount += counselorResult.total || 0;
-      }
-
-      if (doctorResult.success || counselorResult.success) {
-        setDoctors(allUsers);
-        setTotal(totalCount);
+      if (result.success) {
+        setDoctors(result.data || []);
+        setTotal(result.total || 0);
       } else {
-        // 显示具体的错误信息
-        const errorMessage = doctorResult.message || counselorResult.message || '加载用户列表失败';
-        message.error(errorMessage);
+        message.error(result.message || '加载医生列表失败');
+        setDoctors([]);
+        setTotal(0);
       }
     } catch (error) {
       message.error('加载医生列表失败，请重试');
+      setDoctors([]);
+      setTotal(0);
     } finally {
       setLoading(false);
     }
@@ -88,14 +99,35 @@ const Doctors = () => {
   // 初始加载
   useEffect(() => {
     if (isAdmin) {
+      loadOrganizations();
       loadDoctors();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination, searchTerm, isAdmin]);
+  }, [pagination, searchTerm, selectedOrgId, selectedStatus, isAdmin]);
 
   // 搜索
   const handleSearch = (value) => {
     setSearchTerm(value);
+    setPagination(prev => ({ ...prev, current: 1 }));
+  };
+
+  // 组织筛选
+  const handleOrgChange = (value) => {
+    setSelectedOrgId(value);
+    setPagination(prev => ({ ...prev, current: 1 }));
+  };
+
+  // 状态筛选
+  const handleStatusChange = (value) => {
+    setSelectedStatus(value);
+    setPagination(prev => ({ ...prev, current: 1 }));
+  };
+
+  // 重置筛选
+  const handleReset = () => {
+    setSearchTerm('');
+    setSelectedOrgId('');
+    setSelectedStatus('');
     setPagination(prev => ({ ...prev, current: 1 }));
   };
 
@@ -189,15 +221,32 @@ const Doctors = () => {
       width: 200
     },
     {
+      title: '角色',
+      key: 'role',
+      width: 100,
+      render: (_, record) => {
+        // 根据doctor_role_id显示角色，同时显示管理员标识
+        const roleText = record.doctor_role?.name || '医生';
+        const isAdmin = record.is_admin;
+
+        return (
+          <Space direction="vertical" size={2}>
+            <Tag color="blue">{roleText}</Tag>
+            {isAdmin && <Tag color="red" size="small">管理员</Tag>}
+          </Space>
+        );
+      }
+    },
+    {
       title: '组织',
       key: 'organization',
       width: 150,
       render: (_, record) => (
         <div>
-          <div>{record.organization?.name || '-'}</div>
-          {record.organization?.type && (
+          <div>{record.organization?.Name || record.organization?.name || '-'}</div>
+          {(record.organization?.Type || record.organization?.type) && (
             <Text type="secondary" style={{ fontSize: 12 }}>
-              {ORGANIZATION_TYPES[record.organization.type]}
+              {record.organization?.TypeText || ORGANIZATION_TYPES[record.organization?.Type || record.organization?.type] || '未知类型'}
             </Text>
           )}
         </div>
@@ -213,6 +262,16 @@ const Doctors = () => {
           {isActive ? '启用' : '禁用'}
         </Tag>
       )
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'created_at',
+      key: 'created_at',
+      width: 150,
+      render: (text) => {
+        if (!text) return '-';
+        return new Date(text).toLocaleString('zh-CN');
+      }
     },
     {
       title: '角色',
@@ -301,8 +360,50 @@ const Doctors = () => {
               placeholder="搜索姓名或邮箱"
               allowClear
               style={{ width: 300 }}
+              value={searchTerm}
               onSearch={handleSearch}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
+
+            <Select
+              placeholder="选择组织"
+              allowClear
+              style={{ width: 200 }}
+              value={selectedOrgId || undefined}
+              onChange={handleOrgChange}
+              loading={organizationsLoading}
+              showSearch
+              filterOption={(input, option) => {
+                const children = option.children;
+                if (typeof children === 'string') {
+                  return children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+                }
+                return false;
+              }}
+            >
+              {organizations.map(org => (
+                <Option key={org.id || org.Id} value={org.id || org.Id}>
+                  {org.name || org.Name}
+                </Option>
+              ))}
+            </Select>
+
+            <Select
+              placeholder="选择状态"
+              allowClear
+              style={{ width: 120 }}
+              value={selectedStatus || undefined}
+              onChange={handleStatusChange}
+            >
+              <Option value="active">启用</Option>
+              <Option value="inactive">禁用</Option>
+            </Select>
+
+            <Button
+              onClick={handleReset}
+            >
+              重置
+            </Button>
 
             <Button
               icon={<ReloadOutlined />}

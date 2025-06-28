@@ -162,9 +162,12 @@ class ApiService {
       const response = await apiClient.get('/consultations', { params });
       return {
         success: true,
-        data: response.data.consulations,
+        data: response.data.consultations,
         total: response.data.total,
-        organizations: response.data.accessible_organizations
+        currentPage: response.data.current_page,
+        perPage: response.data.per_page,
+        lastPage: response.data.last_page,
+        message: response.data?.message || '获取咨询记录成功'
       };
     } catch (error) {
       return {
@@ -279,6 +282,23 @@ class ApiService {
 
   // ==================== 医生管理（管理员权限） ====================
 
+  // 获取医生角色选项
+  async getDoctorRoleOptions() {
+    try {
+      const response = await apiClient.get('/doctors/role-options');
+      return {
+        success: true,
+        data: response.data.roles,
+        message: response.data?.message || '获取角色选项成功'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || '获取角色选项失败'
+      };
+    }
+  }
+
   // 获取医生列表
   async getDoctorList(params = {}) {
     try {
@@ -286,7 +306,8 @@ class ApiService {
       return {
         success: true,
         data: response.data.doctors,
-        total: response.data.total
+        total: response.data.total,
+        message: response.data?.message || '获取医生列表成功'
       };
     } catch (error) {
       return {

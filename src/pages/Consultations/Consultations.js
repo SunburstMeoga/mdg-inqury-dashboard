@@ -38,10 +38,11 @@ const Consultations = () => {
   const [organizations, setOrganizations] = useState([]);
   const [filters, setFilters] = useState({
     page: 1,
-    per_page: PAGINATION_CONFIG.DEFAULT_PAGE_SIZE,
-    search: '',
-    status: '',
-    organization_id: '',
+    perPage: PAGINATION_CONFIG.DEFAULT_PAGE_SIZE,
+    q: '',
+    org_id: '',
+    id_card_number: '',
+    phone_number: '',
     date_range: null
   });
   const [imagePreview, setImagePreview] = useState({
@@ -66,14 +67,17 @@ const Consultations = () => {
     try {
       const params = {
         page: filters.page,
-        per_page: filters.per_page,
-        ...(filters.search && { search: filters.search }),
-        ...(filters.status && { status: filters.status }),
-        ...(filters.organization_id && { organization_id: filters.organization_id }),
+        perPage: filters.perPage,
+        ...(filters.q && { q: filters.q }),
+        ...(filters.org_id && { org_id: filters.org_id }),
+        ...(filters.id_card_number && { id_card_number: filters.id_card_number }),
+        ...(filters.phone_number && { phone_number: filters.phone_number }),
         ...(filters.date_range && {
           start_date: filters.date_range[0].format(DATE_FORMATS.DATE),
           end_date: filters.date_range[1].format(DATE_FORMATS.DATE)
-        })
+        }),
+        sortBy: 'id',
+        sortDesc: true
       };
 
       const result = await ApiService.getConsultationList(params);
@@ -102,26 +106,32 @@ const Consultations = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     filters.page,
-    filters.per_page,
-    filters.search,
-    filters.status,
-    filters.organization_id,
+    filters.perPage,
+    filters.q,
+    filters.org_id,
+    filters.id_card_number,
+    filters.phone_number,
     filters.date_range
   ]);
 
-  // 搜索
+  // 搜索（支持会话ID、身份证号、手机号）
   const handleSearch = (value) => {
-    setFilters(prev => ({ ...prev, search: value, page: 1 }));
-  };
-
-  // 状态筛选
-  const handleStatusChange = (value) => {
-    setFilters(prev => ({ ...prev, status: value, page: 1 }));
+    // 根据输入内容判断搜索类型
+    if (/^\d{11}$/.test(value)) {
+      // 11位数字，可能是手机号
+      setFilters(prev => ({ ...prev, phone_number: value, id_card_number: '', q: '', page: 1 }));
+    } else if (/^\d{15}$|^\d{18}$|^\d{17}[Xx]$/.test(value)) {
+      // 身份证号格式
+      setFilters(prev => ({ ...prev, id_card_number: value, phone_number: '', q: '', page: 1 }));
+    } else {
+      // 其他情况作为会话ID搜索
+      setFilters(prev => ({ ...prev, q: value, phone_number: '', id_card_number: '', page: 1 }));
+    }
   };
 
   // 组织筛选
   const handleOrganizationChange = (value) => {
-    setFilters(prev => ({ ...prev, organization_id: value, page: 1 }));
+    setFilters(prev => ({ ...prev, org_id: value, page: 1 }));
   };
 
   // 日期范围筛选
@@ -134,8 +144,28 @@ const Consultations = () => {
     setFilters(prev => ({
       ...prev,
       page: pagination.current,
-      per_page: pagination.pageSize
+      perPage: pagination.pageSize
     }));
+  };
+
+  // 获取报告
+  const handleFetchReport = async (record) => {
+    try {
+      setLoading(true);
+      const result = await ApiService.forceFetchReport(record.id);
+
+      if (result.success) {
+        message.success(result.message || '报告获取成功');
+        // 刷新列表
+        loadConsultations();
+      } else {
+        message.error(result.message || '报告获取失败');
+      }
+    } catch (error) {
+      message.error('获取报告失败，请重试');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // 下载报告
@@ -171,26 +201,34 @@ const Consultations = () => {
       render: (text) => <Text code>{text}</Text>
     },
     {
+      title: '会话ID',
+      dataIndex: 'session_id',
+      key: 'session_id',
+      width: 120,
+      render: (text) => <Text code>{text || '-'}</Text>
+    },
+    {
       title: '患者姓名',
       key: 'patient_name',
       width: 120,
       render: (_, record) => (
-        <Text strong>{record.patient?.Name || record.patient_id}</Text>
+        <Text strong>{record.patient?.Name || '-'}</Text>
       )
     },
     {
       title: '手机号码',
-      dataIndex: 'PhoneNumber',
       key: 'phone_number',
       width: 130,
-      render: (_,record) => record.patient?.PhoneNumber || '-'
+      render: (_, record) => record.patient?.PhoneNumber || '-'
     },
     {
-      title: '渠道来源',
-      dataIndex: 'ChannelSource',
-      key: 'channel_source',
-      width: 120,
-      render: (_,record) => record.patient?.ChannelSource || '-'
+      title: '身份证号',
+      key: 'id_card_number',
+      width: 150,
+      render: (_, record) => {
+        const idCard = record.patient?.IdValue;
+        return idCard ? `${idCard.slice(0, 6)}****${idCard.slice(-4)}` : '-';
+      }
     },
     {
       title: '创建时间',
@@ -199,17 +237,17 @@ const Consultations = () => {
       width: 160,
       render: (text) => formatDate(text)
     },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      key: 'status',
-      width: 100,
-      render: (status) => (
-        <Tag color={CONSULTATION_STATUS_COLORS[status]}>
-          {CONSULTATION_STATUS_NAMES[status] || status}
-        </Tag>
-      )
-    },
+    // {
+    //   title: '状态',
+    //   dataIndex: 'status',
+    //   key: 'status',
+    //   width: 100,
+    //   render: (status) => (
+    //     <Tag color={CONSULTATION_STATUS_COLORS[status]}>
+    //       {CONSULTATION_STATUS_NAMES[status] || status}
+    //     </Tag>
+    //   )
+    // },
     {
       title: '院区',
       key: 'organization',
@@ -218,20 +256,47 @@ const Consultations = () => {
     },
 
     {
+      title: '报告状态',
+      key: 'report_status',
+      width: 120,
+      render: (_, record) => {
+        if (record.is_fetched) {
+          return <Tag color="success">已生成</Tag>;
+        } else if (record.fetch_failed) {
+          return <Tag color="error">获取失败</Tag>;
+        } else {
+          return <Tag color="warning">未生成</Tag>;
+        }
+      }
+    },
+    {
       title: '操作',
       key: 'action',
-      width: 120,
+      width: 160,
       fixed: 'right',
       render: (_, record) => (
-        <Button
-          type="primary"
-          size="small"
-          icon={<DownloadOutlined />}
-          onClick={() => handleDownload(record)}
-          disabled={!record.report_url}
-        >
-          下载报告
-        </Button>
+        <Space size="small">
+          {record.is_fetched ? (
+            <Button
+              type="primary"
+              size="small"
+              icon={<DownloadOutlined />}
+              onClick={() => handleDownload(record)}
+              disabled={!record.report_url}
+            >
+              下载报告
+            </Button>
+          ) : (
+            <Button
+              type="primary"
+              size="small"
+              onClick={() => handleFetchReport(record)}
+              loading={loading}
+            >
+              获取报告
+            </Button>
+          )}
+        </Space>
       )
     }
   ];
@@ -248,9 +313,9 @@ const Consultations = () => {
         <div className="filter-container">
           <Space wrap size="middle">
             <Search
-              placeholder="搜索手机号码或身份证号"
+              placeholder="搜索会话ID、手机号码或身份证号"
               allowClear
-              style={{ width: 250 }}
+              style={{ width: 280 }}
               onSearch={handleSearch}
             />
 
@@ -303,7 +368,7 @@ const Consultations = () => {
           scroll={{ x: 1200 }}
           pagination={{
             current: filters.page,
-            pageSize: filters.per_page,
+            pageSize: filters.perPage,
             total: total,
             showSizeChanger: PAGINATION_CONFIG.SHOW_SIZE_CHANGER,
             showQuickJumper: PAGINATION_CONFIG.SHOW_QUICK_JUMPER,

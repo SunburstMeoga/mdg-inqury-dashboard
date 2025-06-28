@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Modal, message, Switch, Select, Radio } from 'antd';
+import { Form, Input, Button, Modal, message, Switch, Select } from 'antd';
 import { UserOutlined, MailOutlined, LockOutlined } from '@ant-design/icons';
 import ApiService from '../../services/api';
 
@@ -8,7 +8,9 @@ const { Option } = Select;
 const DoctorForm = ({ visible, doctor, onCancel, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [organizationsLoading, setOrganizationsLoading] = useState(false);
+  const [rolesLoading, setRolesLoading] = useState(false);
   const [organizations, setOrganizations] = useState([]);
+  const [roles, setRoles] = useState([]);
   const [form] = Form.useForm();
 
   // 加载组织列表
@@ -28,10 +30,28 @@ const DoctorForm = ({ visible, doctor, onCancel, onSuccess }) => {
     }
   };
 
+  // 加载角色选项
+  const loadRoles = async () => {
+    setRolesLoading(true);
+    try {
+      const result = await ApiService.getDoctorRoleOptions();
+      if (result.success) {
+        setRoles(result.data || []);
+      } else {
+        message.error(result.message || '加载角色选项失败');
+      }
+    } catch (error) {
+      message.error('加载角色选项失败');
+    } finally {
+      setRolesLoading(false);
+    }
+  };
+
   // 当医生数据变化时，更新表单
   useEffect(() => {
     if (visible) {
       loadOrganizations(); // 加载组织列表
+      loadRoles(); // 加载角色选项
 
       if (doctor) {
         // 编辑模式 - 处理医生的组织信息
@@ -52,7 +72,7 @@ const DoctorForm = ({ visible, doctor, onCancel, onSuccess }) => {
           email: doctor.email,
           is_active: doctor.is_active,
           is_admin: doctor.is_admin,
-          user_type: doctor.user_type || 'doctor',
+          doctor_role_id: doctor.doctor_role_id || 1, // 默认为医生角色
           org_ids: orgIds
         });
       } else {
@@ -61,7 +81,7 @@ const DoctorForm = ({ visible, doctor, onCancel, onSuccess }) => {
         form.setFieldsValue({
           is_active: true,
           is_admin: false,
-          user_type: 'doctor'
+          doctor_role_id: 1 // 默认选择医生角色
         });
       }
     }
@@ -71,37 +91,24 @@ const DoctorForm = ({ visible, doctor, onCancel, onSuccess }) => {
     setLoading(true);
     try {
       let result;
-      const userType = values.user_type || 'doctor';
-      const userTypeText = userType === 'counselor' ? '咨询师' : '医生';
 
       if (doctor) {
-        // 编辑用户
-        if (userType === 'counselor') {
-          result = await ApiService.updateCounselor({
-            id: doctor.id,
-            ...values
-          });
-        } else {
-          result = await ApiService.updateDoctor({
-            id: doctor.id,
-            ...values
-          });
-        }
+        // 编辑医生
+        result = await ApiService.updateDoctor({
+          id: doctor.id,
+          ...values
+        });
       } else {
-        // 创建用户
-        if (userType === 'counselor') {
-          result = await ApiService.createCounselor(values);
-        } else {
-          result = await ApiService.createDoctor(values);
-        }
+        // 创建医生
+        result = await ApiService.createDoctor(values);
       }
 
       if (result.success) {
-        message.success(result.message || `${userTypeText}${doctor ? '更新' : '创建'}成功`);
+        message.success(result.message || `医生${doctor ? '更新' : '创建'}成功`);
         form.resetFields();
         onSuccess && onSuccess();
       } else {
-        message.error(result.message || `${doctor ? '更新' : '创建'}${userTypeText}失败`);
+        message.error(result.message || `${doctor ? '更新' : '创建'}医生失败`);
         // 如果有字段错误，显示在表单中
         if (result.errors) {
           const fieldErrors = Object.keys(result.errors).map(field => ({
@@ -112,9 +119,7 @@ const DoctorForm = ({ visible, doctor, onCancel, onSuccess }) => {
         }
       }
     } catch (error) {
-      const userType = values.user_type || 'doctor';
-      const userTypeText = userType === 'counselor' ? '咨询师' : '医生';
-      message.error(`${doctor ? '更新' : '创建'}${userTypeText}失败，请重试`);
+      message.error(`${doctor ? '更新' : '创建'}医生失败，请重试`);
     } finally {
       setLoading(false);
     }
@@ -132,7 +137,7 @@ const DoctorForm = ({ visible, doctor, onCancel, onSuccess }) => {
       onCancel={handleCancel}
       footer={null}
       width={600}
-      destroyOnClose
+      destroyOnHidden
     >
       <Form
         form={form}
@@ -142,16 +147,30 @@ const DoctorForm = ({ visible, doctor, onCancel, onSuccess }) => {
         size="large"
       >
         <Form.Item
-          label="用户类型"
-          name="user_type"
+          label="用户角色"
+          name="doctor_role_id"
           rules={[
-            { required: true, message: '请选择用户类型' }
+            { required: true, message: '请选择用户角色' }
           ]}
         >
-          <Radio.Group disabled={!!doctor}>
-            <Radio value="doctor">医生</Radio>
-            <Radio value="counselor">咨询师</Radio>
-          </Radio.Group>
+          <Select
+            placeholder="请选择用户角色"
+            disabled={!!doctor}
+            loading={rolesLoading}
+            showSearch
+            filterOption={(input, option) => {
+              const label = option.label;
+              if (typeof label === 'string') {
+                return label.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+              }
+              return false;
+            }}
+            options={roles.map(role => ({
+              value: role.id,
+              label: role.name,
+              title: role.description // 鼠标悬停时显示描述
+            }))}
+          />
         </Form.Item>
 
         <Form.Item
@@ -236,9 +255,13 @@ const DoctorForm = ({ visible, doctor, onCancel, onSuccess }) => {
             placeholder="请选择所属院区（可多选）"
             loading={organizationsLoading}
             showSearch
-            filterOption={(input, option) =>
-              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-            }
+            filterOption={(input, option) => {
+              const children = option.children;
+              if (typeof children === 'string') {
+                return children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+              }
+              return false;
+            }}
           >
             {organizations.map(org => (
               <Option key={org.id || org.Id} value={org.id || org.Id}>
@@ -279,7 +302,7 @@ const DoctorForm = ({ visible, doctor, onCancel, onSuccess }) => {
             <li>密码要求：至少6位，包含大小写字母和数字</li>
             <li>可以选择多个院区，用户将能够访问所选院区的数据</li>
             <li>管理员可以管理其他用户和查看所有数据</li>
-            <li>医生主要负责医疗诊断，咨询师主要负责心理咨询</li>
+            <li>角色决定了用户的职能和权限范围</li>
           </ul>
         </div>
 
