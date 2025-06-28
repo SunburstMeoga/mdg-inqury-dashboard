@@ -85,10 +85,11 @@ const Header = () => {
                   />
                   <div className="user-details">
                     <Text className="user-name">{user?.name}</Text>
-                    <Text className="user-role">
-                      {isAdmin ? '管理员' : '医生'}
+                    {/* <Text className="user-role">
+                      {user?.doctor_role?.name || '医生'}
+                      {isAdmin && ' (管理员)'}
                       {user?.is_active === false && ' (已禁用)'}
-                    </Text>
+                    </Text> */}
                   </div>
                 </div>
               </Dropdown>

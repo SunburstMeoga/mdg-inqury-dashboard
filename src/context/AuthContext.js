@@ -16,26 +16,65 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 检查本地存储中的用户信息
-    const savedUser = localStorage.getItem('doctor_user');
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (error) {
-        console.error('解析用户信息失败:', error);
-        localStorage.removeItem('doctor_user');
-        localStorage.removeItem('doctor_token');
+    const initializeUser = async () => {
+      // 检查本地存储中的用户信息
+      const savedUser = localStorage.getItem('doctor_user');
+      const token = localStorage.getItem('doctor_token');
+
+      if (savedUser && token) {
+        try {
+          const parsedUser = JSON.parse(savedUser);
+          setUser(parsedUser);
+
+          // 如果用户信息不包含doctor_role，尝试刷新获取完整信息
+          if (!parsedUser.doctor_role && parsedUser.id) {
+            try {
+              const detailResult = await ApiService.getDoctorDetail(parsedUser.id);
+              if (detailResult.success) {
+                setUser(detailResult.data);
+                localStorage.setItem('doctor_user', JSON.stringify(detailResult.data));
+              }
+            } catch (error) {
+              console.log('刷新用户信息失败，使用缓存信息');
+            }
+          }
+        } catch (error) {
+          console.error('解析用户信息失败:', error);
+          localStorage.removeItem('doctor_user');
+          localStorage.removeItem('doctor_token');
+        }
       }
-    }
-    setLoading(false);
+      setLoading(false);
+    };
+
+    initializeUser();
   }, []);
 
   const login = async (credentials) => {
     try {
       const result = await ApiService.login(credentials);
       if (result.success) {
-        setUser(result.data.userData);
-        return { success: true, user: result.data.userData, message: result.message };
+        const basicUserData = result.data.userData;
+
+        // 登录成功后，获取完整的用户信息（包括doctor_role）
+        try {
+          const detailResult = await ApiService.getDoctorDetail(basicUserData.id);
+          if (detailResult.success) {
+            // 使用完整的用户信息
+            const fullUserData = detailResult.data;
+            setUser(fullUserData);
+            localStorage.setItem('doctor_user', JSON.stringify(fullUserData));
+            return { success: true, user: fullUserData, message: result.message };
+          } else {
+            // 如果获取详情失败，使用基础用户信息
+            setUser(basicUserData);
+            return { success: true, user: basicUserData, message: result.message };
+          }
+        } catch (error) {
+          // 如果获取详情出错，使用基础用户信息
+          setUser(basicUserData);
+          return { success: true, user: basicUserData, message: result.message };
+        }
       } else {
         return { success: false, message: result.message };
       }
@@ -77,13 +116,23 @@ export const AuthProvider = ({ children }) => {
   // 刷新用户信息
   const refreshUser = async () => {
     try {
-      const result = await ApiService.getDoctorInfo();
-      if (result.success) {
-        setUser(result.data);
-        localStorage.setItem('doctor_user', JSON.stringify(result.data));
-        return { success: true, user: result.data };
+      // 首先尝试获取基础用户信息
+      const basicResult = await ApiService.getDoctorInfo();
+      if (basicResult.success && basicResult.data?.id) {
+        // 然后获取完整的用户详情
+        const detailResult = await ApiService.getDoctorDetail(basicResult.data.id);
+        if (detailResult.success) {
+          setUser(detailResult.data);
+          localStorage.setItem('doctor_user', JSON.stringify(detailResult.data));
+          return { success: true, user: detailResult.data };
+        } else {
+          // 如果获取详情失败，使用基础信息
+          setUser(basicResult.data);
+          localStorage.setItem('doctor_user', JSON.stringify(basicResult.data));
+          return { success: true, user: basicResult.data };
+        }
       } else {
-        return { success: false, message: result.message };
+        return { success: false, message: basicResult.message };
       }
     } catch (error) {
       return { success: false, message: '获取用户信息失败' };
@@ -111,11 +160,37 @@ export const AuthProvider = ({ children }) => {
     isAdmin: user?.is_admin === true,
     // 权限检查方法
     hasPermission: (action, subject) => {
-      if (!user?.ability) return false;
-      return user.ability.some(ability =>
-        (ability.action === action || ability.action === 'manage') &&
-        ability.subject === subject
-      );
+      // 如果没有用户信息，返回false
+      if (!user) return false;
+
+      // 如果有ability字段，使用原有逻辑
+      if (user.ability && Array.isArray(user.ability)) {
+        return user.ability.some(ability =>
+          (ability.action === action || ability.action === 'manage') &&
+          ability.subject === subject
+        );
+      }
+
+      // 如果没有ability字段，使用简化的权限逻辑
+      // 管理员拥有所有权限
+      if (user.is_admin) {
+        return true;
+      }
+
+      // 普通用户的基础权限
+      if (subject === 'Consultation' && action === 'read') {
+        return true; // 所有用户都可以查看咨询记录
+      }
+
+      if (subject === 'Auth' && action === 'read') {
+        return true; // 所有用户都可以管理自己的密码
+      }
+
+      if (subject === 'Doctor' && action === 'manage') {
+        return user.is_admin; // 只有管理员可以管理医生
+      }
+
+      return false;
     },
     // 获取用户组织信息
     getOrganization: () => user?.organization,
