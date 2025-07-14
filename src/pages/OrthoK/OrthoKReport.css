@@ -52,14 +52,20 @@
   padding: 24px;
 }
 
-.report-image-container {
+.report-pdf-container {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   min-height: 400px;
+  width: 100%;
 }
 
-.image-placeholder {
+.pdf-viewer {
+  max-width: 900px;
+  width: 100%;
+}
+
+.pdf-placeholder {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -68,6 +74,7 @@
   color: #999;
   white-space: nowrap;
   text-align: center;
+  min-height: 400px;
 }
 
 .report-loading {

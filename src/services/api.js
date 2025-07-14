@@ -613,7 +613,7 @@ class ApiService {
         success: true,
         data: {
           id: id,
-          reportUrl: 'https://picsum.photos/800/1200?random=' + id,
+          reportUrl: '/004626_20250402113754_report.pdf',
           patientName: '张三',
           visitNumber: 'PS20241214001',
           generateTime: new Date().toISOString()
@@ -744,7 +744,7 @@ class ApiService {
         success: true,
         data: {
           id: id,
-          reportUrl: 'https://picsum.photos/800/1200?random=' + (parseInt(id) + 1000),
+          reportUrl: '/2025-04-09 (1).pdf',
           patientName: '李四',
           visitNumber: 'OK20241214001',
           generateTime: new Date().toISOString()
@@ -759,23 +759,23 @@ class ApiService {
     }
   }
 
-  // 确认塑形镜分析报告
+  // 确认塑形镜分析报告（提交订单）
   async confirmOrthoKReport(id) {
     try {
       // 暂时使用 mock 响应，后续替换为真实 API
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // 更新状态为已确认
-      updateOrthoKStatus(id, 'confirmed');
+      // 更新状态为已提交订单
+      updateOrthoKStatus(id, 'order_submitted');
 
       return {
         success: true,
-        message: '报告确认成功'
+        message: '订单提交成功'
       };
     } catch (error) {
       return {
         success: false,
-        message: '报告确认失败'
+        message: '订单提交失败'
       };
     }
   }

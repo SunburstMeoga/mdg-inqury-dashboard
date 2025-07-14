@@ -78,10 +78,11 @@ export const ANALYSIS_STATUS = {
   PENDING: 'pending',
   GENERATING: 'generating',
   COMPLETED: 'completed',
-  CONFIRMED: 'confirmed'
+  CONFIRMED: 'confirmed',
+  ORDER_SUBMITTED: 'order_submitted'
 };
 
-// 术前分析和塑形镜分析状态中文名称
+// 术前分析状态中文名称
 export const ANALYSIS_STATUS_NAMES = {
   [ANALYSIS_STATUS.PENDING]: '待处理',
   [ANALYSIS_STATUS.GENERATING]: '正在生成报告',
@@ -89,12 +90,21 @@ export const ANALYSIS_STATUS_NAMES = {
   [ANALYSIS_STATUS.CONFIRMED]: '已确认'
 };
 
+// 塑形镜分析状态中文名称（包含已提交订单状态）
+export const ORTHOK_STATUS_NAMES = {
+  [ANALYSIS_STATUS.PENDING]: '待处理',
+  [ANALYSIS_STATUS.GENERATING]: '正在生成报告',
+  [ANALYSIS_STATUS.COMPLETED]: '已完成',
+  [ANALYSIS_STATUS.ORDER_SUBMITTED]: '已提交订单'
+};
+
 // 术前分析和塑形镜分析状态颜色
 export const ANALYSIS_STATUS_COLORS = {
   [ANALYSIS_STATUS.PENDING]: 'orange',
   [ANALYSIS_STATUS.GENERATING]: 'blue',
   [ANALYSIS_STATUS.COMPLETED]: 'green',
-  [ANALYSIS_STATUS.CONFIRMED]: 'purple'
+  [ANALYSIS_STATUS.CONFIRMED]: 'purple',
+  [ANALYSIS_STATUS.ORDER_SUBMITTED]: 'cyan'
 };
 
 // 组织类型

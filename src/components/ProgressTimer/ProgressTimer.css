@@ -1,0 +1,28 @@
+.progress-timer {
+  width: 100%;
+  max-width: 120px;
+}
+
+.progress-info {
+  margin-top: 4px;
+  text-align: center;
+}
+
+.progress-timer .ant-progress-line {
+  margin-bottom: 0;
+}
+
+.progress-timer .ant-progress-bg {
+  border-radius: 4px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .progress-timer {
+    max-width: 100px;
+  }
+  
+  .progress-info {
+    font-size: 10px;
+  }
+}

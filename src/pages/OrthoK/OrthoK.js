@@ -22,7 +22,8 @@ import {
   BankOutlined
 } from '@ant-design/icons';
 import ApiService from '../../services/api';
-import { ANALYSIS_STATUS_NAMES, ANALYSIS_STATUS_COLORS } from '../../utils/constants';
+import { ORTHOK_STATUS_NAMES, ANALYSIS_STATUS_COLORS } from '../../utils/constants';
+import ProgressTimer from '../../components/ProgressTimer/ProgressTimer';
 import './OrthoK.css';
 
 const { Search } = Input;
@@ -150,12 +151,30 @@ const OrthoK = () => {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
-      width: 120,
-      render: (status) => (
-        <Tag color={ANALYSIS_STATUS_COLORS[status]}>
-          {ANALYSIS_STATUS_NAMES[status]}
-        </Tag>
-      )
+      width: 160,
+      render: (status, record) => {
+        if (status === 'generating') {
+          return (
+            <div>
+              <Tag color={ANALYSIS_STATUS_COLORS[status]} style={{ marginBottom: 8 }}>
+                {ORTHOK_STATUS_NAMES[status]}
+              </Tag>
+              <ProgressTimer
+                duration={600000} // 10分钟
+                onComplete={() => {
+                  // 进度完成后可以刷新数据或显示通知
+                  console.log('报告生成完成');
+                }}
+              />
+            </div>
+          );
+        }
+        return (
+          <Tag color={ANALYSIS_STATUS_COLORS[status]}>
+            {ORTHOK_STATUS_NAMES[status]}
+          </Tag>
+        );
+      }
     },
     {
       title: '创建时间',
@@ -213,6 +232,12 @@ const OrthoK = () => {
                 </Button>
               </Tooltip>
             </Space>
+          );
+        } else if (record.status === 'order_submitted') {
+          return (
+            <Text type="secondary" style={{ color: '#52c41a' }}>
+              订单已提交
+            </Text>
           );
         } else {
           return (

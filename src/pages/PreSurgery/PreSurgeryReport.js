@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Card, 
-  Button, 
-  Space, 
-  message, 
+import {
+  Card,
+  Button,
+  Space,
+  message,
   Typography,
   Spin,
   Modal,
-  Input,
-  Image
+  Input
 } from 'antd';
 import { 
   ArrowLeftOutlined,
@@ -196,20 +195,28 @@ const PreSurgeryReport = () => {
       {/* 报告内容 */}
       <Card className="report-content-card">
         <div className="report-content">
-          <div className="report-image-container">
-            <Image
-              src={reportData.reportUrl}
-              alt="术前分析报告"
-              style={{ width: '100%', maxWidth: '800px' }}
-              placeholder={
-                <div className="image-placeholder">
-                  <Spin size="large" />
-                  <Text style={{ marginTop: 16, display: 'block' }}>
-                    正在加载报告图片...
-                  </Text>
-                </div>
-              }
-            />
+          <div className="report-pdf-container">
+            {reportData.reportUrl ? (
+              <iframe
+                src={reportData.reportUrl}
+                title="术前分析报告"
+                className="pdf-viewer"
+                style={{
+                  width: '100%',
+                  height: '800px',
+                  border: 'none',
+                  borderRadius: '8px',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+                }}
+              />
+            ) : (
+              <div className="pdf-placeholder">
+                <Spin size="large" />
+                <Text style={{ marginTop: 16, display: 'block' }}>
+                  正在加载报告...
+                </Text>
+              </div>
+            )}
           </div>
         </div>
       </Card>
@@ -237,6 +244,7 @@ const PreSurgeryReport = () => {
           rows={6}
           maxLength={500}
           showCount
+          style={{ marginBottom: 16 }}
         />
       </Modal>
     </div>

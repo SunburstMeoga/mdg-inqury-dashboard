@@ -137,7 +137,7 @@ export const generateMockPreSurgeryData = (count = 30) => {
 export const generateMockOrthoKData = (count = 25) => {
   const data = [];
   const names = ['张三', '李四', '王五', '赵六', '钱七', '孙八', '周九', '吴十', '郑十一', '王十二', '冯十三', '陈十四', '褚十五', '卫十六', '蒋十七', '沈十八', '韩十九', '杨二十'];
-  const statuses = ['pending', 'generating', 'completed', 'confirmed'];
+  const statuses = ['pending', 'generating', 'completed', 'order_submitted'];
 
   for (let i = 0; i < count; i++) {
     const createDate = getRandomDate(new Date(2024, 0, 1), new Date());

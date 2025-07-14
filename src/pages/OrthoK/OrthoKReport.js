@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Card, 
-  Button, 
-  Space, 
-  message, 
+import {
+  Card,
+  Button,
+  Space,
+  message,
   Typography,
   Spin,
   Modal,
-  Input,
-  Image
+  Input
 } from 'antd';
 import { 
   ArrowLeftOutlined,
@@ -61,13 +60,13 @@ const OrthoKReport = () => {
     navigate('/orthok');
   };
 
-  // 确认报告
+  // 提交订单
   const handleConfirm = () => {
     Modal.confirm({
-      title: '确认报告',
+      title: '提交订单',
       icon: <ExclamationCircleOutlined />,
-      content: '确认后报告状态将变为"已确认"，确定要继续吗？',
-      okText: '确认',
+      content: '确认提交塑形镜订单？提交后状态将变为"已提交订单"。',
+      okText: '提交订单',
       cancelText: '取消',
       onOk: async () => {
         setActionLoading(true);
@@ -81,7 +80,7 @@ const OrthoKReport = () => {
             message.error(result.message);
           }
         } catch (error) {
-          message.error('确认失败，请重试');
+          message.error('提交失败，请重试');
         } finally {
           setActionLoading(false);
         }
@@ -179,7 +178,7 @@ const OrthoKReport = () => {
                 loading={actionLoading}
                 onClick={handleConfirm}
               >
-                确认
+                提交订单
               </Button>
               <Button
                 type="default"
@@ -196,20 +195,28 @@ const OrthoKReport = () => {
       {/* 报告内容 */}
       <Card className="report-content-card">
         <div className="report-content">
-          <div className="report-image-container">
-            <Image
-              src={reportData.reportUrl}
-              alt="塑形镜分析报告"
-              style={{ width: '100%', maxWidth: '800px' }}
-              placeholder={
-                <div className="image-placeholder">
-                  <Spin size="large" />
-                  <Text style={{ marginTop: 16, display: 'block' }}>
-                    正在加载报告图片...
-                  </Text>
-                </div>
-              }
-            />
+          <div className="report-pdf-container">
+            {reportData.reportUrl ? (
+              <iframe
+                src={reportData.reportUrl}
+                title="塑形镜分析报告"
+                className="pdf-viewer"
+                style={{
+                  width: '100%',
+                  height: '800px',
+                  border: 'none',
+                  borderRadius: '8px',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+                }}
+              />
+            ) : (
+              <div className="pdf-placeholder">
+                <Spin size="large" />
+                <Text style={{ marginTop: 16, display: 'block' }}>
+                  正在加载报告...
+                </Text>
+              </div>
+            )}
           </div>
         </div>
       </Card>
@@ -237,6 +244,7 @@ const OrthoKReport = () => {
           rows={6}
           maxLength={500}
           showCount
+          style={{ marginBottom: 16 }}
         />
       </Modal>
     </div>
