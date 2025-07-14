@@ -6,6 +6,10 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './components/Login/Login';
 import MainLayout from './components/Layout/MainLayout';
 import Consultations from './pages/Consultations/Consultations';
+import PreSurgery from './pages/PreSurgery/PreSurgery';
+import PreSurgeryReport from './pages/PreSurgery/PreSurgeryReport';
+import OrthoK from './pages/OrthoK/OrthoK';
+import OrthoKReport from './pages/OrthoK/OrthoKReport';
 import Statistics from './pages/Statistics/Statistics';
 import Doctors from './pages/Doctors/Doctors';
 import Password from './pages/Password/Password';
@@ -73,6 +77,14 @@ function App() {
 
                   {/* 预问诊记录页面 */}
                   <Route path="consultations" element={<Consultations />} />
+
+                  {/* 术前分析页面 */}
+                  <Route path="pre-surgery" element={<PreSurgery />} />
+                  <Route path="pre-surgery/report/:id" element={<PreSurgeryReport />} />
+
+                  {/* 塑形镜分析页面 */}
+                  <Route path="orthok" element={<OrthoK />} />
+                  <Route path="orthok/report/:id" element={<OrthoKReport />} />
 
                   {/* 统计分析页面 */}
                   <Route path="statistics" element={<Statistics />} />

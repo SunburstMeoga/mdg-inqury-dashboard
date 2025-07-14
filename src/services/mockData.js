@@ -72,3 +72,146 @@ export const searchReports = (searchTerm) => {
 export const getReportById = (id) => {
   return mockReports.find(report => report.id === id);
 };
+
+// 生成随机年龄
+const getRandomAge = () => {
+  return Math.floor(Math.random() * 60) + 18; // 18-78岁
+};
+
+// 生成随机性别
+const getRandomGender = () => {
+  return Math.random() > 0.5 ? '男' : '女';
+};
+
+// 生成随机就诊号
+const getRandomVisitNumber = (prefix) => {
+  const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+  return `${prefix}${date}${random}`;
+};
+
+// 生成随机医院名称
+const getRandomHospital = () => {
+  const hospitals = [
+    '北京同仁医院',
+    '上海第一人民医院',
+    '广州中山大学附属第一医院',
+    '深圳市人民医院',
+    '杭州浙江大学医学院附属第一医院',
+    '成都华西医院',
+    '武汉协和医院',
+    '西安交通大学第一附属医院',
+    '南京鼓楼医院',
+    '天津医科大学总医院'
+  ];
+  return hospitals[Math.floor(Math.random() * hospitals.length)];
+};
+
+// 生成术前分析Mock数据
+export const generateMockPreSurgeryData = (count = 30) => {
+  const data = [];
+  const names = ['张三', '李四', '王五', '赵六', '钱七', '孙八', '周九', '吴十', '郑十一', '王十二', '冯十三', '陈十四', '褚十五', '卫十六', '蒋十七', '沈十八', '韩十九', '杨二十'];
+  const statuses = ['pending', 'generating', 'completed', 'confirmed'];
+
+  for (let i = 0; i < count; i++) {
+    const createDate = getRandomDate(new Date(2024, 0, 1), new Date());
+
+    data.push({
+      id: `PS${(i + 1).toString().padStart(6, '0')}`,
+      visitNumber: getRandomVisitNumber('PS'),
+      patientName: names[Math.floor(Math.random() * names.length)],
+      age: getRandomAge(),
+      gender: getRandomGender(),
+      status: statuses[Math.floor(Math.random() * statuses.length)],
+      createTime: createDate.toISOString(),
+      updateTime: new Date(createDate.getTime() + Math.random() * 24 * 60 * 60 * 1000).toISOString(),
+      surgeryType: ['近视手术', '白内障手术', '青光眼手术', '视网膜手术'][Math.floor(Math.random() * 4)],
+      doctorName: ['张医生', '李医生', '王医生', '赵医生'][Math.floor(Math.random() * 4)]
+    });
+  }
+
+  return data.sort((a, b) => new Date(b.createTime) - new Date(a.createTime));
+};
+
+// 生成塑形镜分析Mock数据
+export const generateMockOrthoKData = (count = 25) => {
+  const data = [];
+  const names = ['张三', '李四', '王五', '赵六', '钱七', '孙八', '周九', '吴十', '郑十一', '王十二', '冯十三', '陈十四', '褚十五', '卫十六', '蒋十七', '沈十八', '韩十九', '杨二十'];
+  const statuses = ['pending', 'generating', 'completed', 'confirmed'];
+
+  for (let i = 0; i < count; i++) {
+    const createDate = getRandomDate(new Date(2024, 0, 1), new Date());
+
+    data.push({
+      id: `OK${(i + 1).toString().padStart(6, '0')}`,
+      visitNumber: getRandomVisitNumber('OK'),
+      patientName: names[Math.floor(Math.random() * names.length)],
+      age: getRandomAge(),
+      gender: getRandomGender(),
+      hospital: getRandomHospital(),
+      status: statuses[Math.floor(Math.random() * statuses.length)],
+      createTime: createDate.toISOString(),
+      updateTime: new Date(createDate.getTime() + Math.random() * 24 * 60 * 60 * 1000).toISOString(),
+      lensType: ['夜戴型', '日戴型', '特殊定制型'][Math.floor(Math.random() * 3)],
+      doctorName: ['张医生', '李医生', '王医生', '赵医生'][Math.floor(Math.random() * 4)]
+    });
+  }
+
+  return data.sort((a, b) => new Date(b.createTime) - new Date(a.createTime));
+};
+
+// 术前分析Mock数据
+export const mockPreSurgeryData = generateMockPreSurgeryData();
+
+// 塑形镜分析Mock数据
+export const mockOrthoKData = generateMockOrthoKData();
+
+// 根据就诊号搜索术前分析数据
+export const searchPreSurgeryData = (searchTerm) => {
+  if (!searchTerm) return mockPreSurgeryData;
+
+  return mockPreSurgeryData.filter(item =>
+    item.visitNumber.includes(searchTerm) ||
+    item.patientName.includes(searchTerm)
+  );
+};
+
+// 根据就诊号搜索塑形镜分析数据
+export const searchOrthoKData = (searchTerm) => {
+  if (!searchTerm) return mockOrthoKData;
+
+  return mockOrthoKData.filter(item =>
+    item.visitNumber.includes(searchTerm) ||
+    item.patientName.includes(searchTerm)
+  );
+};
+
+// 更新术前分析数据状态
+export const updatePreSurgeryStatus = (id, newStatus) => {
+  const item = mockPreSurgeryData.find(item => item.id === id);
+  if (item) {
+    item.status = newStatus;
+    item.updateTime = new Date().toISOString();
+  }
+  return item;
+};
+
+// 更新塑形镜分析数据状态
+export const updateOrthoKStatus = (id, newStatus) => {
+  const item = mockOrthoKData.find(item => item.id === id);
+  if (item) {
+    item.status = newStatus;
+    item.updateTime = new Date().toISOString();
+  }
+  return item;
+};
+
+// 根据ID获取术前分析数据
+export const getPreSurgeryById = (id) => {
+  return mockPreSurgeryData.find(item => item.id === id);
+};
+
+// 根据ID获取塑形镜分析数据
+export const getOrthoKById = (id) => {
+  return mockOrthoKData.find(item => item.id === id);
+};

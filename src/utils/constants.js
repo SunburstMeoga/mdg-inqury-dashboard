@@ -17,6 +17,18 @@ export const MENU_ITEMS = [
     permission: { action: 'read', subject: 'Consultation' }
   },
   {
+    key: 'pre-surgery',
+    label: '术前分析',
+    path: '/pre-surgery',
+    permission: { action: 'read', subject: 'PreSurgery' }
+  },
+  {
+    key: 'orthok',
+    label: '塑形镜分析',
+    path: '/orthok',
+    permission: { action: 'read', subject: 'OrthoK' }
+  },
+  {
     key: 'statistics',
     label: '统计分析',
     path: '/statistics',
@@ -59,6 +71,30 @@ export const CONSULTATION_STATUS_COLORS = {
   [CONSULTATION_STATUS.PENDING]: 'warning',
   [CONSULTATION_STATUS.FAILED]: 'error',
   [CONSULTATION_STATUS.GENERATED]: 'success'
+};
+
+// 术前分析和塑形镜分析状态
+export const ANALYSIS_STATUS = {
+  PENDING: 'pending',
+  GENERATING: 'generating',
+  COMPLETED: 'completed',
+  CONFIRMED: 'confirmed'
+};
+
+// 术前分析和塑形镜分析状态中文名称
+export const ANALYSIS_STATUS_NAMES = {
+  [ANALYSIS_STATUS.PENDING]: '待处理',
+  [ANALYSIS_STATUS.GENERATING]: '正在生成报告',
+  [ANALYSIS_STATUS.COMPLETED]: '已完成',
+  [ANALYSIS_STATUS.CONFIRMED]: '已确认'
+};
+
+// 术前分析和塑形镜分析状态颜色
+export const ANALYSIS_STATUS_COLORS = {
+  [ANALYSIS_STATUS.PENDING]: 'orange',
+  [ANALYSIS_STATUS.GENERATING]: 'blue',
+  [ANALYSIS_STATUS.COMPLETED]: 'green',
+  [ANALYSIS_STATUS.CONFIRMED]: 'purple'
 };
 
 // 组织类型

@@ -5,7 +5,9 @@ import {
   FileTextOutlined,
   BarChartOutlined,
   TeamOutlined,
-  LockOutlined
+  LockOutlined,
+  MedicineBoxOutlined,
+  EyeOutlined
 } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
 import { MENU_ITEMS } from '../../utils/constants';
@@ -21,6 +23,8 @@ const Sidebar = ({ collapsed, onCollapse }) => {
   // 图标映射
   const iconMap = {
     consultations: <FileTextOutlined />,
+    'pre-surgery': <MedicineBoxOutlined />,
+    orthok: <EyeOutlined />,
     statistics: <BarChartOutlined />,
     doctors: <TeamOutlined />,
     password: <LockOutlined />
@@ -52,6 +56,8 @@ const Sidebar = ({ collapsed, onCollapse }) => {
   const getSelectedKey = () => {
     const path = location.pathname;
     if (path.includes('consultations')) return 'consultations';
+    if (path.includes('pre-surgery')) return 'pre-surgery';
+    if (path.includes('orthok')) return 'orthok';
     if (path.includes('statistics')) return 'statistics';
     if (path.includes('doctors')) return 'doctors';
     if (path.includes('password')) return 'password';

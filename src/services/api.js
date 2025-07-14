@@ -1,4 +1,12 @@
 import axios from 'axios';
+import {
+  searchPreSurgeryData,
+  searchOrthoKData,
+  updatePreSurgeryStatus,
+  updateOrthoKStatus,
+  getPreSurgeryById,
+  getOrthoKById
+} from './mockData';
 
 // API基础配置
 const API_BASE_URL = 'https://app-api.maidige.com:7443/api/consultation-backend';
@@ -547,6 +555,268 @@ class ApiService {
       (ability.action === action || ability.action === 'manage') &&
       ability.subject === subject
     );
+  }
+
+  // ==================== 术前分析管理 ====================
+
+  // 获取术前分析列表
+  async getPreSurgeryList(searchTerm = '') {
+    try {
+      // 暂时使用 mock 数据，后续替换为真实 API
+      const data = searchPreSurgeryData(searchTerm);
+
+      // 模拟网络延迟
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      return {
+        success: true,
+        data: data,
+        total: data.length,
+        message: '获取术前分析列表成功'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: '获取术前分析列表失败'
+      };
+    }
+  }
+
+  // 开始生成术前分析报告
+  async startPreSurgeryGeneration(id) {
+    try {
+      // 暂时使用 mock 响应，后续替换为真实 API
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // 更新状态为正在生成报告
+      updatePreSurgeryStatus(id, 'generating');
+
+      return {
+        success: true,
+        message: '开始生成术前分析报告'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: '开始生成报告失败'
+      };
+    }
+  }
+
+  // 获取术前分析报告详情
+  async getPreSurgeryReportDetail(id) {
+    try {
+      // 暂时使用 mock 响应，后续替换为真实 API
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      return {
+        success: true,
+        data: {
+          id: id,
+          reportUrl: 'https://picsum.photos/800/1200?random=' + id,
+          patientName: '张三',
+          visitNumber: 'PS20241214001',
+          generateTime: new Date().toISOString()
+        },
+        message: '获取报告详情成功'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: '获取报告详情失败'
+      };
+    }
+  }
+
+  // 确认术前分析报告
+  async confirmPreSurgeryReport(id) {
+    try {
+      // 暂时使用 mock 响应，后续替换为真实 API
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // 更新状态为已确认
+      updatePreSurgeryStatus(id, 'confirmed');
+
+      return {
+        success: true,
+        message: '报告确认成功'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: '报告确认失败'
+      };
+    }
+  }
+
+  // 提交术前分析修改意见
+  async submitPreSurgeryModification(id, comment) {
+    try {
+      // 暂时使用 mock 响应，后续替换为真实 API
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // 更新状态为正在生成报告
+      updatePreSurgeryStatus(id, 'generating');
+
+      return {
+        success: true,
+        message: '修改意见提交成功，正在重新生成报告'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: '修改意见提交失败'
+      };
+    }
+  }
+
+  // 修改术前分析报告
+  async modifyPreSurgeryReport(id) {
+    try {
+      // 暂时使用 mock 响应，后续替换为真实 API
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      return {
+        success: true,
+        message: '进入报告修改页面'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: '进入修改页面失败'
+      };
+    }
+  }
+
+  // ==================== 塑形镜分析管理 ====================
+
+  // 获取塑形镜分析列表
+  async getOrthoKList(searchTerm = '') {
+    try {
+      // 暂时使用 mock 数据，后续替换为真实 API
+      const data = searchOrthoKData(searchTerm);
+
+      // 模拟网络延迟
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      return {
+        success: true,
+        data: data,
+        total: data.length,
+        message: '获取塑形镜分析列表成功'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: '获取塑形镜分析列表失败'
+      };
+    }
+  }
+
+  // 开始生成塑形镜分析报告
+  async startOrthoKGeneration(id) {
+    try {
+      // 暂时使用 mock 响应，后续替换为真实 API
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // 更新状态为正在生成报告
+      updateOrthoKStatus(id, 'generating');
+
+      return {
+        success: true,
+        message: '开始生成塑形镜分析报告'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: '开始生成报告失败'
+      };
+    }
+  }
+
+  // 获取塑形镜分析报告详情
+  async getOrthoKReportDetail(id) {
+    try {
+      // 暂时使用 mock 响应，后续替换为真实 API
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      return {
+        success: true,
+        data: {
+          id: id,
+          reportUrl: 'https://picsum.photos/800/1200?random=' + (parseInt(id) + 1000),
+          patientName: '李四',
+          visitNumber: 'OK20241214001',
+          generateTime: new Date().toISOString()
+        },
+        message: '获取报告详情成功'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: '获取报告详情失败'
+      };
+    }
+  }
+
+  // 确认塑形镜分析报告
+  async confirmOrthoKReport(id) {
+    try {
+      // 暂时使用 mock 响应，后续替换为真实 API
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // 更新状态为已确认
+      updateOrthoKStatus(id, 'confirmed');
+
+      return {
+        success: true,
+        message: '报告确认成功'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: '报告确认失败'
+      };
+    }
+  }
+
+  // 提交塑形镜分析修改意见
+  async submitOrthoKModification(id, comment) {
+    try {
+      // 暂时使用 mock 响应，后续替换为真实 API
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // 更新状态为正在生成报告
+      updateOrthoKStatus(id, 'generating');
+
+      return {
+        success: true,
+        message: '修改意见提交成功，正在重新生成报告'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: '修改意见提交失败'
+      };
+    }
+  }
+
+  // 修改塑形镜分析报告
+  async modifyOrthoKReport(id) {
+    try {
+      // 暂时使用 mock 响应，后续替换为真实 API
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      return {
+        success: true,
+        message: '进入报告修改页面'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: '进入修改页面失败'
+      };
+    }
   }
 }
 
