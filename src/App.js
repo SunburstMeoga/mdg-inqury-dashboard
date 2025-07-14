@@ -5,6 +5,7 @@ import zhCN from 'antd/locale/zh_CN';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './components/Login/Login';
 import MainLayout from './components/Layout/MainLayout';
+import LoadingScreen from './components/LoadingScreen/LoadingScreen';
 import Consultations from './pages/Consultations/Consultations';
 import PreSurgery from './pages/PreSurgery/PreSurgery';
 import PreSurgeryReport from './pages/PreSurgery/PreSurgeryReport';
@@ -13,6 +14,7 @@ import OrthoKReport from './pages/OrthoK/OrthoKReport';
 import Statistics from './pages/Statistics/Statistics';
 import Doctors from './pages/Doctors/Doctors';
 import Password from './pages/Password/Password';
+import LoadingDemo from './pages/LoadingDemo/LoadingDemo';
 import { THEME_COLOR } from './utils/constants';
 import './App.css';
 
@@ -21,7 +23,7 @@ const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingScreen />;
   }
 
   return isAuthenticated ? children : <Navigate to="/login" replace />;
@@ -32,7 +34,7 @@ const PublicRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingScreen />;
   }
 
   return !isAuthenticated ? children : <Navigate to="/consultations" replace />;
@@ -94,6 +96,9 @@ function App() {
 
                   {/* 密码管理页面 */}
                   <Route path="password" element={<Password />} />
+
+                  {/* 加载屏幕演示页面 */}
+                  <Route path="loading-demo" element={<LoadingDemo />} />
                 </Route>
 
                 {/* 404页面重定向 */}

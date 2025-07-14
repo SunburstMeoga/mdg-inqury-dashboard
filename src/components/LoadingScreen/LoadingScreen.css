@@ -1,0 +1,623 @@
+/* 主容器 */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #0a1428 0%, #1a2332 50%, #004EA2 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+/* 背景动画 */
+.bg-animation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* 网格线条 */
+.grid-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(0, 78, 162, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 78, 162, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: gridMove 20s linear infinite;
+}
+
+@keyframes gridMove {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(50px, 50px); }
+}
+
+/* 浮动粒子 */
+.floating-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(0, 78, 162, 0.6);
+  border-radius: 50%;
+  animation: float 6s ease-in-out infinite;
+}
+
+.particle:nth-child(odd) {
+  background: rgba(64, 169, 255, 0.8);
+  animation-delay: -2s;
+}
+
+.particle:nth-child(3n) {
+  background: rgba(135, 208, 104, 0.6);
+  animation-delay: -4s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  50% { transform: translateY(-100px) rotate(180deg); }
+}
+
+/* 为每个粒子设置不同位置 */
+.particle-0 { left: 10%; animation-duration: 8s; }
+.particle-1 { left: 20%; animation-duration: 6s; animation-delay: -1s; }
+.particle-2 { left: 30%; animation-duration: 7s; animation-delay: -2s; }
+.particle-3 { left: 40%; animation-duration: 9s; animation-delay: -3s; }
+.particle-4 { left: 50%; animation-duration: 5s; animation-delay: -4s; }
+.particle-5 { left: 60%; animation-duration: 8s; animation-delay: -5s; }
+.particle-6 { left: 70%; animation-duration: 6s; animation-delay: -1.5s; }
+.particle-7 { left: 80%; animation-duration: 7s; animation-delay: -2.5s; }
+.particle-8 { left: 90%; animation-duration: 8s; animation-delay: -3.5s; }
+.particle-9 { left: 15%; animation-duration: 6s; animation-delay: -0.5s; }
+.particle-10 { left: 25%; animation-duration: 9s; animation-delay: -1.8s; }
+.particle-11 { left: 35%; animation-duration: 7s; animation-delay: -2.8s; }
+.particle-12 { left: 45%; animation-duration: 5s; animation-delay: -3.8s; }
+.particle-13 { left: 55%; animation-duration: 8s; animation-delay: -4.8s; }
+.particle-14 { left: 65%; animation-duration: 6s; animation-delay: -0.8s; }
+.particle-15 { left: 75%; animation-duration: 7s; animation-delay: -1.3s; }
+.particle-16 { left: 85%; animation-duration: 9s; animation-delay: -2.3s; }
+.particle-17 { left: 95%; animation-duration: 8s; animation-delay: -3.3s; }
+.particle-18 { left: 5%; animation-duration: 6s; animation-delay: -4.3s; }
+.particle-19 { left: 12%; animation-duration: 7s; animation-delay: -0.3s; }
+
+/* 主要内容 */
+.loading-content {
+  position: relative;
+  text-align: center;
+  z-index: 10;
+}
+
+/* Logo区域 */
+.logo-section {
+  margin-bottom: 60px;
+}
+
+.logo-container {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 30px;
+}
+
+/* 眼科专业图标 */
+.eye-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 50px;
+}
+
+.eye-outer {
+  width: 80px;
+  height: 50px;
+  border: 3px solid #40a9ff;
+  border-radius: 50px 50px 50px 50px / 25px 25px 25px 25px;
+  position: relative;
+  background: linear-gradient(135deg, rgba(64, 169, 255, 0.1), rgba(135, 208, 104, 0.1));
+  box-shadow: 0 0 20px rgba(64, 169, 255, 0.3);
+  animation: eyeBlink 4s ease-in-out infinite;
+}
+
+.eye-inner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #40a9ff, #1890ff);
+  box-shadow: 0 0 15px rgba(64, 169, 255, 0.5);
+}
+
+.pupil {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  background: #000;
+  border-radius: 50%;
+  animation: pupilMove 3s ease-in-out infinite;
+}
+
+.iris-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 25px;
+  height: 25px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  animation: irisRotate 6s linear infinite;
+}
+
+.eyelash {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #40a9ff, transparent);
+}
+
+.eyelash-top {
+  top: -5px;
+  animation: eyelashTop 4s ease-in-out infinite;
+}
+
+.eyelash-bottom {
+  bottom: -5px;
+  animation: eyelashBottom 4s ease-in-out infinite;
+}
+
+@keyframes eyeBlink {
+  0%, 90%, 100% { transform: translate(-50%, -50%) scaleY(1); }
+  95% { transform: translate(-50%, -50%) scaleY(0.1); }
+}
+
+@keyframes pupilMove {
+  0%, 100% { transform: translate(-50%, -50%); }
+  25% { transform: translate(-40%, -50%); }
+  50% { transform: translate(-50%, -40%); }
+  75% { transform: translate(-60%, -50%); }
+}
+
+@keyframes irisRotate {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes eyelashTop {
+  0%, 90%, 100% { opacity: 1; transform: translateX(-50%) scaleY(1); }
+  95% { opacity: 0.3; transform: translateX(-50%) scaleY(0.2); }
+}
+
+@keyframes eyelashBottom {
+  0%, 90%, 100% { opacity: 1; transform: translateX(-50%) scaleY(1); }
+  95% { opacity: 0.3; transform: translateX(-50%) scaleY(0.2); }
+}
+
+/* 脉冲环 */
+.pulse-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  border: 2px solid rgba(64, 169, 255, 0.3);
+  border-radius: 50%;
+  animation: pulse 2s ease-out infinite;
+}
+
+.pulse-ring-delay {
+  animation-delay: 1s;
+  border-color: rgba(135, 208, 104, 0.3);
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+  }
+}
+
+/* 品牌标题样式 */
+.brand-section {
+  margin-top: 20px;
+}
+
+.brand-title {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  margin-bottom: 8px !important;
+  font-size: 32px !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  animation: brandGlow 3s ease-in-out infinite alternate;
+  letter-spacing: 2px;
+}
+
+.brand-subtitle {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-size: 14px;
+  letter-spacing: 3px;
+  font-weight: 300;
+  margin-bottom: 16px !important;
+  display: block;
+}
+
+.system-info {
+  margin-top: 16px;
+  padding: 8px 16px;
+  background: rgba(64, 169, 255, 0.1);
+  border-radius: 20px;
+  border: 1px solid rgba(64, 169, 255, 0.3);
+  display: inline-block;
+}
+
+.system-name {
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+@keyframes brandGlow {
+  0% {
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3), 0 0 30px rgba(64, 169, 255, 0.2);
+  }
+  100% {
+    text-shadow: 0 2px 20px rgba(64, 169, 255, 0.4), 0 0 40px rgba(64, 169, 255, 0.3);
+  }
+}
+
+/* 进度区域 */
+.progress-section {
+  margin-bottom: 40px;
+}
+
+.progress-container {
+  width: 400px;
+  max-width: 80vw;
+}
+
+.progress-bar {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #40a9ff, #87d068);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.progress-text {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.loading-text {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-size: 14px;
+}
+
+.progress-percentage {
+  color: #40a9ff !important;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* 医疗图标 */
+.medical-icons {
+  margin-bottom: 40px;
+}
+
+.icon-container {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+}
+
+.medical-icon {
+  width: 40px;
+  height: 40px;
+  position: relative;
+}
+
+/* 视力表图标 */
+.vision-chart {
+  position: relative;
+}
+
+.chart-lines {
+  width: 40px;
+  height: 40px;
+  position: relative;
+}
+
+.chart-line {
+  position: absolute;
+  background: #52c41a;
+  border-radius: 1px;
+  animation: chartPulse 2s ease-in-out infinite;
+}
+
+.line-1 {
+  width: 30px;
+  height: 3px;
+  top: 5px;
+  left: 5px;
+  animation-delay: 0s;
+}
+
+.line-2 {
+  width: 24px;
+  height: 3px;
+  top: 12px;
+  left: 8px;
+  animation-delay: 0.2s;
+}
+
+.line-3 {
+  width: 18px;
+  height: 3px;
+  top: 19px;
+  left: 11px;
+  animation-delay: 0.4s;
+}
+
+.line-4 {
+  width: 12px;
+  height: 3px;
+  top: 26px;
+  left: 14px;
+  animation-delay: 0.6s;
+}
+
+@keyframes chartPulse {
+  0%, 100% { opacity: 0.6; transform: scaleX(1); }
+  50% { opacity: 1; transform: scaleX(1.1); }
+}
+
+/* 镜片图标 */
+.lens {
+  position: relative;
+}
+
+.lens-outer {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #1890ff;
+  border-radius: 50%;
+  position: relative;
+  animation: lensRotate 4s linear infinite;
+}
+
+.lens-inner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(24, 144, 255, 0.5);
+  border-radius: 50%;
+}
+
+.lens-reflection {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 8px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  animation: reflection 2s ease-in-out infinite;
+}
+
+@keyframes lensRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes reflection {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* 视网膜图标 */
+.retina {
+  position: relative;
+  width: 40px;
+  height: 40px;
+}
+
+.retina-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: #ff4d4f;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255, 77, 79, 0.5);
+  animation: retinaPulse 2s ease-in-out infinite;
+}
+
+.blood-vessel {
+  position: absolute;
+  background: linear-gradient(90deg, #ff4d4f, transparent);
+  height: 2px;
+  border-radius: 1px;
+  animation: bloodFlow 3s ease-in-out infinite;
+}
+
+.vessel-1 {
+  width: 20px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(0deg);
+  animation-delay: 0s;
+}
+
+.vessel-2 {
+  width: 18px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(90deg);
+  animation-delay: 0.5s;
+}
+
+.vessel-3 {
+  width: 16px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  animation-delay: 1s;
+}
+
+.vessel-4 {
+  width: 14px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(135deg);
+  animation-delay: 1.5s;
+}
+
+@keyframes retinaPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.3); }
+}
+
+@keyframes bloodFlow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* 数据流 */
+.data-streams {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.data-stream {
+  position: absolute;
+  width: 2px;
+  height: 100px;
+  background: linear-gradient(to bottom, transparent, #40a9ff, transparent);
+  animation: dataFlow 4s linear infinite;
+}
+
+.data-point {
+  width: 6px;
+  height: 6px;
+  background: #40a9ff;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: -2px;
+  box-shadow: 0 0 10px #40a9ff;
+}
+
+@keyframes dataFlow {
+  0% { transform: translateY(-100px); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+.stream-0 { left: 10%; animation-delay: 0s; }
+.stream-1 { left: 25%; animation-delay: 0.5s; }
+.stream-2 { left: 40%; animation-delay: 1s; }
+.stream-3 { left: 60%; animation-delay: 1.5s; }
+.stream-4 { left: 75%; animation-delay: 2s; }
+.stream-5 { left: 90%; animation-delay: 2.5s; }
+
+/* 底部信息 */
+.footer-info {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.footer-info .ant-typography {
+  color: rgba(255, 255, 255, 0.6) !important;
+  font-size: 12px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .progress-container {
+    width: 300px;
+  }
+  
+  .icon-container {
+    gap: 40px;
+  }
+  
+  .system-title {
+    font-size: 24px !important;
+  }
+  
+  .system-subtitle {
+    font-size: 14px;
+  }
+}

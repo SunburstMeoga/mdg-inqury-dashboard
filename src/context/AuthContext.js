@@ -44,7 +44,11 @@ export const AuthProvider = ({ children }) => {
           localStorage.removeItem('doctor_token');
         }
       }
-      setLoading(false);
+
+      // 确保加载屏幕至少显示3秒，让用户看到完整的动画效果
+      setTimeout(() => {
+        setLoading(false);
+      }, 3000);
     };
 
     initializeUser();
