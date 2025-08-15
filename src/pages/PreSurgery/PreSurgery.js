@@ -49,6 +49,13 @@ const PreSurgery = () => {
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [actionLoading, setActionLoading] = useState({});
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+    totalGroups: 0,
+    totalRecords: 0
+  });
 
   // 使用报告轮询Hook
   const {
@@ -71,11 +78,15 @@ const PreSurgery = () => {
   }, [stopAllPolling]);
 
   // 搜索数据
-  const handleSearch = async (value) => {
+  const handleSearch = async (value, page = 1, pageSize = pagination.pageSize) => {
     setLoading(true);
     try {
       // 构建搜索参数
-      const params = {};
+      const params = {
+        page: page,
+        per_page: pageSize
+      };
+
       if (value) {
         // 根据输入内容判断是门诊号还是患者姓名
         if (/^[A-Z]{2}\d+$/.test(value)) {
@@ -90,6 +101,14 @@ const PreSurgery = () => {
       if (result.success) {
         setData(result.data);
         setSearchTerm(value);
+        setPagination(prev => ({
+          ...prev,
+          current: result.current_page || page,
+          pageSize: result.per_page || pageSize,
+          total: result.total_groups || 0,
+          totalGroups: result.total_groups || 0,
+          totalRecords: result.total_records || 0
+        }));
       } else {
         message.error(result.message);
       }
@@ -108,7 +127,7 @@ const PreSurgery = () => {
       if (result.success) {
         message.success(result.message);
         // 刷新数据
-        handleSearch(searchTerm);
+        handleSearch(searchTerm, pagination.current, pagination.pageSize);
       } else {
         // 显示详细的错误信息
         if (result.errors) {
@@ -135,10 +154,10 @@ const PreSurgery = () => {
         // 开始轮询报告状态
         startPolling(result.data.report.report_id, record.visit_id, (status, reportData) => {
           // 轮询完成回调
-          handleSearch(searchTerm);
+          handleSearch(searchTerm, pagination.current, pagination.pageSize);
         });
         // 刷新数据
-        handleSearch(searchTerm);
+        handleSearch(searchTerm, pagination.current, pagination.pageSize);
       } else {
         // 显示详细的错误信息
         if (result.errors) {
@@ -158,6 +177,18 @@ const PreSurgery = () => {
   // 查看报告
   const handleViewReport = (record) => {
     navigate(`/pre-surgery/report/${record.visit_id}`);
+  };
+
+  // 分页变化处理
+  const handleTableChange = (paginationConfig) => {
+    const { current, pageSize } = paginationConfig;
+    setPagination(prev => ({
+      ...prev,
+      current,
+      pageSize
+    }));
+    // 重新搜索数据
+    handleSearch(searchTerm, current, pageSize);
   };
 
   // 修改报告（直接跳转到报告页面）
@@ -386,7 +417,7 @@ const PreSurgery = () => {
             )}
           </Title>
           <Text type="secondary">
-            共找到 {data.length} 条记录
+            共找到 {pagination.totalGroups} 个分组，{pagination.totalRecords} 条记录
           </Text>
         </div>
 
@@ -397,13 +428,16 @@ const PreSurgery = () => {
           loading={loading}
           scroll={{ x: 1200 }}
           pagination={{
-            total: data.length,
-            pageSize: 10,
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
             showSizeChanger: true,
             showQuickJumper: true,
             showTotal: (total, range) =>
-              `第 ${range[0]}-${range[1]} 条，共 ${total} 条记录`
+              `第 ${range[0]}-${range[1]} 条，共 ${total} 条分组`,
+            pageSizeOptions: ['10', '20', '50', '100']
           }}
+          onChange={handleTableChange}
           className="analysis-table"
         />
       </Card>
