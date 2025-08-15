@@ -8,7 +8,9 @@ import {
   Tag,
   message,
   Typography,
-  Tooltip
+  Tooltip,
+  Progress,
+  Modal
 } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -19,10 +21,22 @@ import {
   IdcardOutlined,
   CalendarOutlined,
   EyeOutlined,
-  BankOutlined
+  BankOutlined,
+  FileTextOutlined,
+  ExperimentOutlined
 } from '@ant-design/icons';
 import ApiService from '../../services/api';
-import { ORTHOK_STATUS_NAMES, ANALYSIS_STATUS_COLORS } from '../../utils/constants';
+import {
+  ORTHOK_STATUS_NAMES,
+  ANALYSIS_STATUS_COLORS,
+  PACS_REPORT_STATUS,
+  PACS_REPORT_STATUS_NAMES,
+  PACS_REPORT_STATUS_COLORS,
+  COMPREHENSIVE_REPORT_STATUS,
+  COMPREHENSIVE_REPORT_STATUS_NAMES,
+  COMPREHENSIVE_REPORT_STATUS_COLORS
+} from '../../utils/constants';
+import useReportPolling from '../../hooks/useReportPolling';
 import ProgressTimer from '../../components/ProgressTimer/ProgressTimer';
 import './OrthoK.css';
 
@@ -36,16 +50,43 @@ const OrthoK = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [actionLoading, setActionLoading] = useState({});
 
+  // 使用报告轮询Hook
+  const {
+    reportPolling,
+    startPolling,
+    stopAllPolling,
+    isPolling
+  } = useReportPolling();
+
   // 初始加载数据
   useEffect(() => {
     handleSearch('');
   }, []);
 
+  // 清理轮询定时器
+  useEffect(() => {
+    return () => {
+      stopAllPolling();
+    };
+  }, [stopAllPolling]);
+
   // 搜索数据
   const handleSearch = async (value) => {
     setLoading(true);
     try {
-      const result = await ApiService.getOrthoKList(value);
+      // 构建搜索参数
+      const params = {};
+      if (value) {
+        // 根据输入内容判断是门诊号还是患者姓名
+        if (/^[A-Z]{2}\d+$/.test(value)) {
+          params.outpatient_number = value;
+        } else {
+          // 暂时使用门诊号搜索，因为API不支持按姓名搜索
+          params.outpatient_number = value;
+        }
+      }
+
+      const result = await ApiService.getPacsRecordsGrouped(params);
       if (result.success) {
         setData(result.data);
         setSearchTerm(value);
@@ -59,191 +100,245 @@ const OrthoK = () => {
     }
   };
 
-  // 开始生成报告
-  const handleStartGeneration = async (record) => {
-    setActionLoading(prev => ({ ...prev, [record.id]: true }));
+  // 触发AI分析
+  const handleTriggerAiAnalysis = async (record) => {
+    setActionLoading(prev => ({ ...prev, [`ai_${record.visit_id}`]: true }));
     try {
-      const result = await ApiService.startOrthoKGeneration(record.id);
+      const result = await ApiService.triggerAiAnalysis(record.visit_id);
       if (result.success) {
         message.success(result.message);
         // 刷新数据
         handleSearch(searchTerm);
       } else {
-        message.error(result.message);
+        // 显示详细的错误信息
+        if (result.errors) {
+          const errorMessages = Object.values(result.errors).flat();
+          message.error(`${result.message}: ${errorMessages.join(', ')}`);
+        } else {
+          message.error(result.message);
+        }
       }
     } catch (error) {
-      message.error('操作失败，请重试');
+      message.error('触发AI分析失败，请重试');
     } finally {
-      setActionLoading(prev => ({ ...prev, [record.id]: false }));
+      setActionLoading(prev => ({ ...prev, [`ai_${record.visit_id}`]: false }));
+    }
+  };
+
+  // 生成综合报告
+  const handleGenerateReport = async (record) => {
+    setActionLoading(prev => ({ ...prev, [`report_${record.visit_id}`]: true }));
+    try {
+      const result = await ApiService.generateComprehensiveReport(record.visit_id);
+      if (result.success) {
+        message.success(result.message);
+        // 开始轮询报告状态
+        startPolling(result.data.report.report_id, record.visit_id, (status, reportData) => {
+          // 轮询完成回调
+          handleSearch(searchTerm);
+        });
+        // 刷新数据
+        handleSearch(searchTerm);
+      } else {
+        // 显示详细的错误信息
+        if (result.errors) {
+          const errorMessages = Object.values(result.errors).flat();
+          message.error(`${result.message}: ${errorMessages.join(', ')}`);
+        } else {
+          message.error(result.message);
+        }
+      }
+    } catch (error) {
+      message.error('生成综合报告失败，请重试');
+    } finally {
+      setActionLoading(prev => ({ ...prev, [`report_${record.visit_id}`]: false }));
     }
   };
 
   // 查看报告
   const handleViewReport = (record) => {
-    navigate(`/orthok/report/${record.id}`);
+    navigate(`/orthok/report/${record.visit_id}`);
   };
 
   // 修改报告（直接跳转到报告页面）
   const handleModifyReport = (record) => {
-    navigate(`/orthok/report/${record.id}?mode=edit`);
+    navigate(`/orthok/report/${record.visit_id}?mode=edit`);
   };
 
   // 格式化日期
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleString('zh-CN');
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  // 检查是否可以触发AI分析
+  const canTriggerAiAnalysis = (records) => {
+    return records && records.some(record => record.report_status === PACS_REPORT_STATUS.PENDING);
+  };
+
+  // 检查是否可以生成综合报告
+  const canGenerateReport = (records) => {
+    return records && records.length > 0 && records.every(record => record.report_status === PACS_REPORT_STATUS.FINISHED);
+  };
+
+  // 获取记录状态摘要
+  const getRecordsSummary = (records) => {
+    if (!records || records.length === 0) return '无记录';
+
+    const pending = records.filter(r => r.report_status === PACS_REPORT_STATUS.PENDING).length;
+    const processing = records.filter(r => r.report_status === PACS_REPORT_STATUS.PROCESSING).length;
+    const finished = records.filter(r => r.report_status === PACS_REPORT_STATUS.FINISHED).length;
+
+    return `总计${records.length}项 (未处理:${pending}, 处理中:${processing}, 已完成:${finished})`;
   };
 
   // 表格列定义
   const columns = [
     {
       title: '就诊号',
-      dataIndex: 'visitNumber',
-      key: 'visitNumber',
-      width: 150,
+      dataIndex: 'outpatient_number',
+      key: 'outpatient_number',
+      width: 140,
       render: (text) => (
         <Space>
           <IdcardOutlined style={{ color: '#666' }} />
-          <Text code>{text}</Text>
-        </Space>
-      )
-    },
-    {
-      title: '姓名',
-      dataIndex: 'patientName',
-      key: 'patientName',
-      width: 100,
-      render: (text) => (
-        <Space>
-          <UserOutlined style={{ color: '#666' }} />
           <Text strong>{text}</Text>
         </Space>
       )
     },
     {
-      title: '年龄',
-      dataIndex: 'age',
-      key: 'age',
-      width: 80,
-      render: (age) => <Text>{age}岁</Text>
+      title: '患者ID',
+      dataIndex: 'patient_id',
+      key: 'patient_id',
+      width: 100,
+      render: (text) => (
+        <Space>
+          <UserOutlined style={{ color: '#666' }} />
+          <Text>{text}</Text>
+        </Space>
+      )
     },
     {
-      title: '性别',
-      dataIndex: 'gender',
-      key: 'gender',
-      width: 80,
-      render: (gender) => (
-        <Tag color={gender === '男' ? 'blue' : 'pink'}>{gender}</Tag>
+      title: '身份证号',
+      dataIndex: 'id_card_number',
+      key: 'id_card_number',
+      width: 160,
+      render: (text) => (
+        <Text>{text ? `${text.slice(0, 6)}****${text.slice(-4)}` : '-'}</Text>
       )
     },
     {
       title: '合作机构',
-      dataIndex: 'hospital',
-      key: 'hospital',
+      dataIndex: 'organization_name',
+      key: 'organization_name',
       width: 180,
-      render: (hospital) => (
+      render: (text) => (
         <Space>
           <BankOutlined style={{ color: '#666' }} />
-          <Text>{hospital}</Text>
+          <Text>{text}</Text>
         </Space>
       )
     },
     {
-      title: '状态',
-      dataIndex: 'status',
-      key: 'status',
-      width: 160,
-      render: (status, record) => {
-        if (status === 'generating') {
+      title: 'PACS记录状态',
+      dataIndex: 'records',
+      key: 'records_status',
+      width: 200,
+      render: (records, record) => {
+        const polling = reportPolling[record.visit_id];
+
+        if (polling) {
           return (
             <div>
-              <Tag color={ANALYSIS_STATUS_COLORS[status]} style={{ marginBottom: 8 }}>
-                {ORTHOK_STATUS_NAMES[status]}
+              <Tag color="blue" style={{ marginBottom: 8 }}>
+                正在生成综合报告
               </Tag>
-              <ProgressTimer
-                duration={600000} // 10分钟
-                onComplete={() => {
-                  // 进度完成后可以刷新数据或显示通知
-                  console.log('报告生成完成');
-                }}
+              <Progress
+                percent={polling.progress}
+                size="small"
+                status="active"
+                format={percent => `${percent}%`}
               />
             </div>
           );
         }
+
         return (
-          <Tag color={ANALYSIS_STATUS_COLORS[status]}>
-            {ORTHOK_STATUS_NAMES[status]}
-          </Tag>
+          <div>
+            <Text type="secondary" style={{ fontSize: '12px' }}>
+              {getRecordsSummary(records)}
+            </Text>
+            <div style={{ marginTop: 4 }}>
+              {records && records.slice(0, 3).map((record, index) => (
+                <Tag
+                  key={index}
+                  color={PACS_REPORT_STATUS_COLORS[record.report_status]}
+                  size="small"
+                  style={{ marginBottom: 2 }}
+                >
+                  {record.examination_type}: {PACS_REPORT_STATUS_NAMES[record.report_status]}
+                </Tag>
+              ))}
+              {records && records.length > 3 && (
+                <Text type="secondary" style={{ fontSize: '12px' }}>
+                  ...等{records.length - 3}项
+                </Text>
+              )}
+            </div>
+          </div>
         );
       }
     },
     {
-      title: '创建时间',
-      dataIndex: 'createTime',
-      key: 'createTime',
-      width: 160,
-      render: (text) => (
-        <Space>
-          <CalendarOutlined style={{ color: '#666' }} />
-          <Text>{formatDate(text)}</Text>
-        </Space>
-      )
-    },
-    {
       title: '操作',
       key: 'action',
-      width: 160,
+      width: 200,
       fixed: 'right',
       render: (_, record) => {
-        if (record.status === 'pending') {
-          return (
-            <Tooltip title="开始生成报告">
-              <Button
-                type="primary"
-                icon={<PlayCircleOutlined />}
-                size="small"
-                loading={actionLoading[record.id]}
-                onClick={() => handleStartGeneration(record)}
-              >
-                生成
-              </Button>
-            </Tooltip>
-          );
-        } else if (record.status === 'completed') {
-          return (
+        const canTriggerAi = canTriggerAiAnalysis(record.records);
+        const canGenerate = canGenerateReport(record.records);
+        const isPollingReport = isPolling(record.visit_id);
+
+        return (
+          <Space size="small" direction="vertical">
             <Space size="small">
-              <Tooltip title="查看报告">
-                <Button
-                  type="primary"
-                  icon={<EyeOutlined />}
-                  size="small"
-                  onClick={() => handleViewReport(record)}
-                >
-                  查看
-                </Button>
-              </Tooltip>
-              <Tooltip title="修改报告">
-                <Button
-                  type="default"
-                  icon={<EditOutlined />}
-                  size="small"
-                  onClick={() => handleModifyReport(record)}
-                >
-                  修改
-                </Button>
-              </Tooltip>
+              {canTriggerAi && (
+                <Tooltip title="触发AI分析">
+                  <Button
+                    type="primary"
+                    icon={<ExperimentOutlined />}
+                    size="small"
+                    loading={actionLoading[`ai_${record.visit_id}`]}
+                    onClick={() => handleTriggerAiAnalysis(record)}
+                  >
+                    AI分析
+                  </Button>
+                </Tooltip>
+              )}
+              {canGenerate && !isPollingReport && (
+                <Tooltip title="生成综合报告">
+                  <Button
+                    type="primary"
+                    icon={<FileTextOutlined />}
+                    size="small"
+                    loading={actionLoading[`report_${record.visit_id}`]}
+                    onClick={() => handleGenerateReport(record)}
+                  >
+                    生成报告
+                  </Button>
+                </Tooltip>
+              )}
             </Space>
-          );
-        } else if (record.status === 'order_submitted') {
-          return (
-            <Text type="secondary" style={{ color: '#52c41a' }}>
-              订单已提交
-            </Text>
-          );
-        } else {
-          return (
-            <Text type="secondary">-</Text>
-          );
-        }
+            {/* 这里可以添加查看报告的按钮，当报告生成完成后 */}
+          </Space>
+        );
       }
     }
   ];
@@ -298,7 +393,7 @@ const OrthoK = () => {
         <Table
           columns={columns}
           dataSource={data}
-          rowKey="id"
+          rowKey="visit_id"
           loading={loading}
           scroll={{ x: 1200 }}
           pagination={{

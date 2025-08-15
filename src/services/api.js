@@ -818,6 +818,91 @@ class ApiService {
       };
     }
   }
+
+  // ==================== PACS 记录管理 ====================
+
+  // 获取分组的 PACS 记录列表
+  async getPacsRecordsGrouped(params = {}) {
+    try {
+      const response = await apiClient.get('/pacs-records/grouped', { params });
+
+      return {
+        success: true,
+        data: response.data.grouped_records || [],
+        total_groups: response.data.total_groups || 0,
+        total_records: response.data.total_records || 0,
+        current_page: response.data.current_page || 1,
+        per_page: response.data.per_page || 10,
+        message: response.data.message || '成功获取分组的 PACS 记录列表'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || '获取 PACS 记录列表失败'
+      };
+    }
+  }
+
+  // 触发 AI 分析
+  async triggerAiAnalysis(visitId) {
+    try {
+      const response = await apiClient.post('/pacs-records/trigger-ai-analysis', {
+        visit_id: String(visitId) // 确保 visit_id 是字符串类型
+      });
+
+      return {
+        success: true,
+        data: response.data,
+        message: response.data.message || 'AI 分析触发完成'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || '触发 AI 分析失败',
+        errors: error.response?.data?.errors // 包含详细的验证错误信息
+      };
+    }
+  }
+
+  // 生成综合报告
+  async generateComprehensiveReport(visitId) {
+    try {
+      const response = await apiClient.post('/pacs-records/generate-comprehensive-report', {
+        visit_id: String(visitId) // 确保 visit_id 是字符串类型
+      });
+
+      return {
+        success: true,
+        data: response.data,
+        message: response.data.message || '综合报告生成已启动'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || '生成综合报告失败',
+        error: error.response?.data?.error,
+        errors: error.response?.data?.errors // 包含详细的验证错误信息
+      };
+    }
+  }
+
+  // 查询综合报告状态
+  async getReportStatus(reportId) {
+    try {
+      const response = await apiClient.get(`/pacs-reports/${reportId}/status`);
+
+      return {
+        success: true,
+        data: response.data,
+        message: response.data.message || '成功获取报告状态'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || '获取报告状态失败'
+      };
+    }
+  }
 }
 
 const apiService = new ApiService();

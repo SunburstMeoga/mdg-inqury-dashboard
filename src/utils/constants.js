@@ -114,6 +114,51 @@ export const ORGANIZATION_TYPES = {
   3: '连锁机构'
 };
 
+// PACS 记录报告状态
+export const PACS_REPORT_STATUS = {
+  PENDING: 0,      // 未处理
+  PROCESSING: 1,   // 处理中
+  FINISHED: 2      // 已完成
+};
+
+// PACS 记录报告状态中文名称
+export const PACS_REPORT_STATUS_NAMES = {
+  [PACS_REPORT_STATUS.PENDING]: '未处理',
+  [PACS_REPORT_STATUS.PROCESSING]: '处理中',
+  [PACS_REPORT_STATUS.FINISHED]: '已完成'
+};
+
+// PACS 记录报告状态颜色
+export const PACS_REPORT_STATUS_COLORS = {
+  [PACS_REPORT_STATUS.PENDING]: 'orange',
+  [PACS_REPORT_STATUS.PROCESSING]: 'blue',
+  [PACS_REPORT_STATUS.FINISHED]: 'green'
+};
+
+// 综合报告生成状态
+export const COMPREHENSIVE_REPORT_STATUS = {
+  PENDING: 'pending',      // 等待中
+  PROCESSING: 'processing', // 生成中
+  COMPLETED: 'completed',   // 已完成
+  FAILED: 'failed'         // 失败
+};
+
+// 综合报告生成状态中文名称
+export const COMPREHENSIVE_REPORT_STATUS_NAMES = {
+  [COMPREHENSIVE_REPORT_STATUS.PENDING]: '等待中',
+  [COMPREHENSIVE_REPORT_STATUS.PROCESSING]: '生成中',
+  [COMPREHENSIVE_REPORT_STATUS.COMPLETED]: '已完成',
+  [COMPREHENSIVE_REPORT_STATUS.FAILED]: '生成失败'
+};
+
+// 综合报告生成状态颜色
+export const COMPREHENSIVE_REPORT_STATUS_COLORS = {
+  [COMPREHENSIVE_REPORT_STATUS.PENDING]: 'orange',
+  [COMPREHENSIVE_REPORT_STATUS.PROCESSING]: 'blue',
+  [COMPREHENSIVE_REPORT_STATUS.COMPLETED]: 'green',
+  [COMPREHENSIVE_REPORT_STATUS.FAILED]: 'red'
+};
+
 // 分页配置
 export const PAGINATION_CONFIG = {
   DEFAULT_PAGE_SIZE: 15,
