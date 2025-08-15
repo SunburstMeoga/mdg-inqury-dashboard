@@ -18,6 +18,23 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  // 使用自定义的transformResponse来处理大整数
+  transformResponse: [function (data) {
+    if (typeof data === 'string') {
+      try {
+        // 使用正则表达式将大整数转换为字符串，避免精度丢失
+        // 匹配可能的大整数字段（如 visit_id, id 等）
+        const processedData = data.replace(
+          /"(visit_id|id|session_id|report_id)"\s*:\s*(\d{16,})/g,
+          '"$1":"$2"'
+        );
+        return JSON.parse(processedData);
+      } catch (e) {
+        return data;
+      }
+    }
+    return data;
+  }]
 });
 
 // 请求拦截器 - 添加认证token
@@ -846,8 +863,12 @@ class ApiService {
   // 触发 AI 分析
   async triggerAiAnalysis(visitId) {
     try {
+      // 由于已在axios层面处理大整数，这里直接使用visitId
+      // 确保传递给API的是字符串类型
+      const visitIdStr = typeof visitId === 'string' ? visitId : String(visitId);
+
       const response = await apiClient.post('/pacs-records/trigger-ai-analysis', {
-        visit_id: String(visitId) // 确保 visit_id 是字符串类型
+        visit_id: visitIdStr
       });
 
       return {
@@ -867,8 +888,12 @@ class ApiService {
   // 生成综合报告
   async generateComprehensiveReport(visitId) {
     try {
+      // 由于已在axios层面处理大整数，这里直接使用visitId
+      // 确保传递给API的是字符串类型
+      const visitIdStr = typeof visitId === 'string' ? visitId : String(visitId);
+
       const response = await apiClient.post('/pacs-records/generate-comprehensive-report', {
-        visit_id: String(visitId) // 确保 visit_id 是字符串类型
+        visit_id: visitIdStr
       });
 
       return {
