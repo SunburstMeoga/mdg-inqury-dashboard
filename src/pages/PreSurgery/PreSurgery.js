@@ -23,7 +23,9 @@ import {
   CalendarOutlined,
   MedicineBoxOutlined,
   FileTextOutlined,
-  ExperimentOutlined
+  ExperimentOutlined,
+  DownloadOutlined,
+  ReloadOutlined
 } from '@ant-design/icons';
 import ApiService from '../../services/api';
 import {
@@ -84,7 +86,8 @@ const PreSurgery = () => {
       // 构建搜索参数
       const params = {
         page: page,
-        per_page: pageSize
+        per_page: pageSize,
+        department: '屈光科'  // 术前分析页面传入屈光科
       };
 
       if (value) {
@@ -172,6 +175,85 @@ const PreSurgery = () => {
     } finally {
       setActionLoading(prev => ({ ...prev, [`report_${record.visit_id}`]: false }));
     }
+  };
+
+  // 查询综合报告状态
+  const handleQueryReportStatus = async (record) => {
+    const reportId = record.comprehensive_report?.report_id;
+    if (!reportId) {
+      message.error('报告ID不存在');
+      return;
+    }
+
+    setActionLoading(prev => ({ ...prev, [`status_${record.visit_id}`]: true }));
+    try {
+      const result = await ApiService.getReportStatus(reportId);
+      if (result.success) {
+        const { status, progress } = result.data;
+
+        if (status === 'completed') {
+          message.success('报告生成完成');
+          // 更新本地数据
+          setData(prevData =>
+            prevData.map(item =>
+              item.visit_id === record.visit_id
+                ? {
+                    ...item,
+                    comprehensive_report: {
+                      ...item.comprehensive_report,
+                      status: 'completed',
+                      ...result.data
+                    }
+                  }
+                : item
+            )
+          );
+        } else if (status === 'processing') {
+          message.info(`报告生成中，进度：${progress || 0}%`);
+        } else if (status === 'failed') {
+          message.error('报告生成失败');
+        } else {
+          message.info(`报告状态：${status}`);
+        }
+      } else {
+        message.error(result.message);
+      }
+    } catch (error) {
+      message.error('查询报告状态失败，请重试');
+    } finally {
+      setActionLoading(prev => ({ ...prev, [`status_${record.visit_id}`]: false }));
+    }
+  };
+
+  // 下载报告
+  const handleDownloadReport = (record) => {
+    const downloadUrl = record.comprehensive_report?.download_url;
+    if (!downloadUrl) {
+      message.error('下载链接不存在');
+      return;
+    }
+
+    // 创建一个隐藏的链接元素来触发下载
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.target = '_blank';
+    link.download = `综合报告_${record.patient_name || record.visit_id}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    message.success('开始下载报告');
+  };
+
+  // 重新生成报告
+  const handleRegenerateReport = async (record) => {
+    Modal.confirm({
+      title: '重新生成报告',
+      content: '确认要重新生成综合报告吗？这将覆盖现有报告。',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => handleGenerateReport(record)
+    });
   };
 
   // 查看报告
@@ -330,12 +412,101 @@ const PreSurgery = () => {
     {
       title: '操作',
       key: 'action',
-      width: 200,
+      width: 250,
       fixed: 'right',
       render: (_, record) => {
         const canTriggerAi = canTriggerAiAnalysis(record.records);
         const canGenerate = canGenerateReport(record.records);
         const isPollingReport = isPolling(record.visit_id);
+        const comprehensiveReport = record.comprehensive_report;
+
+        // 根据综合报告状态决定显示的按钮
+        const renderReportButtons = () => {
+          if (!comprehensiveReport) {
+            // comprehensive_report = null：显示生成综合报告按钮
+            return canGenerate && !isPollingReport && (
+              <Tooltip title="生成综合报告">
+                <Button
+                  type="primary"
+                  icon={<FileTextOutlined />}
+                  size="small"
+                  loading={actionLoading[`report_${record.visit_id}`]}
+                  onClick={() => handleGenerateReport(record)}
+                >
+                  生成报告
+                </Button>
+              </Tooltip>
+            );
+          } else if (comprehensiveReport.status === 'pending') {
+            // status = "pending"：显示查询综合报告状态按钮
+            return (
+              <Tooltip title="查询综合报告状态">
+                <Button
+                  type="default"
+                  icon={<EyeOutlined />}
+                  size="small"
+                  loading={actionLoading[`status_${record.visit_id}`]}
+                  onClick={() => handleQueryReportStatus(record)}
+                >
+                  查询状态
+                </Button>
+              </Tooltip>
+            );
+          } else if (comprehensiveReport.status === 'completed') {
+            // status = "completed"：显示下载报告和重新生成报告按钮
+            return (
+              <Space size="small">
+                <Tooltip title="下载报告">
+                  <Button
+                    type="primary"
+                    icon={<DownloadOutlined />}
+                    size="small"
+                    onClick={() => handleDownloadReport(record)}
+                  >
+                    下载报告
+                  </Button>
+                </Tooltip>
+                <Tooltip title="重新生成报告">
+                  <Button
+                    type="default"
+                    icon={<ReloadOutlined />}
+                    size="small"
+                    loading={actionLoading[`report_${record.visit_id}`]}
+                    onClick={() => handleRegenerateReport(record)}
+                  >
+                    重新生成
+                  </Button>
+                </Tooltip>
+              </Space>
+            );
+          } else if (comprehensiveReport.status === 'processing') {
+            // status = "processing"：显示查询状态按钮，并显示进度
+            return (
+              <Space size="small" direction="vertical">
+                <Tooltip title="查询综合报告状态">
+                  <Button
+                    type="default"
+                    icon={<EyeOutlined />}
+                    size="small"
+                    loading={actionLoading[`status_${record.visit_id}`]}
+                    onClick={() => handleQueryReportStatus(record)}
+                  >
+                    查询状态
+                  </Button>
+                </Tooltip>
+                {comprehensiveReport.progress !== undefined && (
+                  <Progress
+                    percent={comprehensiveReport.progress}
+                    size="small"
+                    status="active"
+                    format={percent => `${percent}%`}
+                  />
+                )}
+              </Space>
+            );
+          }
+          return null;
+        };
 
         return (
           <Space size="small" direction="vertical">
@@ -353,21 +524,8 @@ const PreSurgery = () => {
                   </Button>
                 </Tooltip>
               )}
-              {canGenerate && !isPollingReport && (
-                <Tooltip title="生成综合报告">
-                  <Button
-                    type="primary"
-                    icon={<FileTextOutlined />}
-                    size="small"
-                    loading={actionLoading[`report_${record.visit_id}`]}
-                    onClick={() => handleGenerateReport(record)}
-                  >
-                    生成报告
-                  </Button>
-                </Tooltip>
-              )}
+              {renderReportButtons()}
             </Space>
-            {/* 这里可以添加查看报告的按钮，当报告生成完成后 */}
           </Space>
         );
       }
