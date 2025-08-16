@@ -9,7 +9,6 @@ import {
   message,
   Typography,
   Tooltip,
-  Progress,
   Modal
 } from 'antd';
 import { useNavigate } from 'react-router-dom';
@@ -151,7 +150,7 @@ const PreSurgery = () => {
   const handleGenerateReport = async (record) => {
     setActionLoading(prev => ({ ...prev, [`report_${record.visit_id}`]: true }));
     try {
-      const result = await ApiService.generateComprehensiveReport(record.visit_id);
+      const result = await ApiService.generateComprehensiveReport(record.visit_id, '屈光科');
       if (result.success) {
         message.success(result.message);
         // 开始轮询报告状态
@@ -370,15 +369,9 @@ const PreSurgery = () => {
         if (polling) {
           return (
             <div>
-              <Tag color="blue" style={{ marginBottom: 8 }}>
+              <Tag color="blue">
                 正在生成综合报告
               </Tag>
-              <Progress
-                percent={polling.progress}
-                size="small"
-                status="active"
-                format={percent => `${percent}%`}
-              />
             </div>
           );
         }
@@ -480,29 +473,19 @@ const PreSurgery = () => {
               </Space>
             );
           } else if (comprehensiveReport.status === 'processing') {
-            // status = "processing"：显示查询状态按钮，并显示进度
+            // status = "processing"：显示查询状态按钮
             return (
-              <Space size="small" direction="vertical">
-                <Tooltip title="查询综合报告状态">
-                  <Button
-                    type="default"
-                    icon={<EyeOutlined />}
-                    size="small"
-                    loading={actionLoading[`status_${record.visit_id}`]}
-                    onClick={() => handleQueryReportStatus(record)}
-                  >
-                    查询状态
-                  </Button>
-                </Tooltip>
-                {comprehensiveReport.progress !== undefined && (
-                  <Progress
-                    percent={comprehensiveReport.progress}
-                    size="small"
-                    status="active"
-                    format={percent => `${percent}%`}
-                  />
-                )}
-              </Space>
+              <Tooltip title="查询综合报告状态">
+                <Button
+                  type="default"
+                  icon={<EyeOutlined />}
+                  size="small"
+                  loading={actionLoading[`status_${record.visit_id}`]}
+                  onClick={() => handleQueryReportStatus(record)}
+                >
+                  查询状态
+                </Button>
+              </Tooltip>
             );
           }
           return null;

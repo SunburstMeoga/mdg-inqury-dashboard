@@ -886,15 +886,22 @@ class ApiService {
   }
 
   // 生成综合报告
-  async generateComprehensiveReport(visitId) {
+  async generateComprehensiveReport(visitId, department) {
     try {
       // 由于已在axios层面处理大整数，这里直接使用visitId
       // 确保传递给API的是字符串类型
       const visitIdStr = typeof visitId === 'string' ? visitId : String(visitId);
 
-      const response = await apiClient.post('/pacs-records/generate-comprehensive-report', {
+      const requestData = {
         visit_id: visitIdStr
-      });
+      };
+
+      // 如果提供了 department 参数，则添加到请求中
+      if (department) {
+        requestData.department = department;
+      }
+
+      const response = await apiClient.post('/pacs-records/generate-comprehensive-report', requestData);
 
       return {
         success: true,
