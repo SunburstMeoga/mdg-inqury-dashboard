@@ -82,10 +82,13 @@ const PreSurgery = () => {
   const handleSearch = async (value, page = 1, pageSize = pagination.pageSize) => {
     setLoading(true);
     try {
-      // 构建搜索参数
+      // 构建搜索参数，确保 page 和 perPage 是整数，防止 NaN
+      const safePage = parseInt(page, 10) || 1;
+      const safePageSize = parseInt(pageSize, 10) || 10;
+
       const params = {
-        page: page,
-        per_page: pageSize,
+        page: safePage,
+        perPage: safePageSize,
         department: '屈光科'  // 术前分析页面传入屈光科
       };
 
@@ -105,11 +108,11 @@ const PreSurgery = () => {
         setSearchTerm(value);
         setPagination(prev => ({
           ...prev,
-          current: result.current_page || page,
-          pageSize: result.per_page || pageSize,
-          total: result.total_groups || 0,
-          totalGroups: result.total_groups || 0,
-          totalRecords: result.total_records || 0
+          current: parseInt(result.current_page || page, 10),
+          pageSize: parseInt(result.per_page || pageSize, 10),
+          total: parseInt(result.total_groups || 0, 10),
+          totalGroups: parseInt(result.total_groups || 0, 10),
+          totalRecords: parseInt(result.total_records || 0, 10)
         }));
       } else {
         message.error(result.message);
@@ -129,7 +132,7 @@ const PreSurgery = () => {
       if (result.success) {
         message.success(result.message);
         // 刷新数据
-        handleSearch(searchTerm, pagination.current, pagination.pageSize);
+        handleSearch(searchTerm, parseInt(pagination.current, 10) || 1, parseInt(pagination.pageSize, 10) || 10);
       } else {
         // 显示详细的错误信息
         if (result.errors) {
@@ -156,10 +159,10 @@ const PreSurgery = () => {
         // 开始轮询报告状态
         startPolling(result.data.report.report_id, record.visit_id, (status, reportData) => {
           // 轮询完成回调
-          handleSearch(searchTerm, pagination.current, pagination.pageSize);
+          handleSearch(searchTerm, parseInt(pagination.current, 10) || 1, parseInt(pagination.pageSize, 10) || 10);
         });
         // 刷新数据
-        handleSearch(searchTerm, pagination.current, pagination.pageSize);
+        handleSearch(searchTerm, parseInt(pagination.current, 10) || 1, parseInt(pagination.pageSize, 10) || 10);
       } else {
         // 显示详细的错误信息
         if (result.errors) {
@@ -263,13 +266,16 @@ const PreSurgery = () => {
   // 分页变化处理
   const handleTableChange = (paginationConfig) => {
     const { current, pageSize } = paginationConfig;
+    const safeCurrent = parseInt(current, 10) || 1;
+    const safePageSize = parseInt(pageSize, 10) || 10;
+
     setPagination(prev => ({
       ...prev,
-      current,
-      pageSize
+      current: safeCurrent,
+      pageSize: safePageSize
     }));
     // 重新搜索数据
-    handleSearch(searchTerm, current, pageSize);
+    handleSearch(searchTerm, safeCurrent, safePageSize);
   };
 
   // 修改报告（直接跳转到报告页面）
@@ -526,13 +532,13 @@ const PreSurgery = () => {
             </Space>
           </Title>
           <Text type="secondary">
-            请输入就诊号或患者姓名进行搜索
+            请输入就诊号进行搜索
           </Text>
         </div>
 
         <div className="search-container">
           <Search
-            placeholder="请输入就诊号或患者姓名"
+            placeholder="请输入就诊号"
             allowClear
             enterButton={
               <Button type="primary" icon={<SearchOutlined />}>
