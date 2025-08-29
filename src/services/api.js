@@ -843,9 +843,22 @@ class ApiService {
     try {
       const response = await apiClient.get('/pacs-records/grouped', { params });
 
+      // 处理新的响应格式，确保数据结构的兼容性
+      const processedData = (response.data.grouped_records || []).map(record => ({
+        ...record,
+        // 确保 comprehensive_reports 是数组
+        comprehensive_reports: record.comprehensive_reports || [],
+        // 保持 comprehensive_report 字段的兼容性（最新报告）
+        comprehensive_report: record.comprehensive_report || null,
+        // 新增的检查数据字段
+        exam_data: record.exam_data || [],
+        // 新增的眼科数据字段
+        ophthalmology_data: record.ophthalmology_data || []
+      }));
+
       return {
         success: true,
-        data: response.data.grouped_records || [],
+        data: processedData,
         total_groups: response.data.total_groups || 0,
         total_records: response.data.total_records || 0,
         current_page: response.data.current_page || 1,
@@ -901,7 +914,9 @@ class ApiService {
         requestData.department = department;
       }
 
+      console.log('发送生成综合报告请求:', requestData);
       const response = await apiClient.post('/pacs-records/generate-comprehensive-report', requestData);
+      console.log('生成综合报告API响应:', response.data);
 
       return {
         success: true,
@@ -909,6 +924,9 @@ class ApiService {
         message: response.data.message || '综合报告生成已启动'
       };
     } catch (error) {
+      console.error('生成综合报告API错误:', error);
+      console.error('错误响应数据:', error.response?.data);
+
       return {
         success: false,
         message: error.response?.data?.message || '生成综合报告失败',

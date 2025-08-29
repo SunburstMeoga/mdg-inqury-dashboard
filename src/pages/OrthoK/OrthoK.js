@@ -156,11 +156,28 @@ const OrthoK = () => {
       const result = await ApiService.generateComprehensiveReport(record.visit_id, '视光科');
       if (result.success) {
         message.success(result.message);
-        // 开始轮询报告状态
-        startPolling(result.data.report.report_id, record.visit_id, (status, reportData) => {
-          // 轮询完成回调
-          handleSearch(searchTerm, parseInt(pagination.current, 10) || 1, parseInt(pagination.pageSize, 10) || 10);
-        });
+
+        // 安全地获取 report_id，支持多种可能的数据结构
+        let reportId = null;
+        if (result.data) {
+          // 尝试不同的可能路径
+          reportId = result.data.report_id ||
+                    result.data.report?.report_id ||
+                    result.data.id ||
+                    result.data.reportId;
+        }
+
+        if (reportId) {
+          // 开始轮询报告状态
+          startPolling(reportId, record.visit_id, (status, reportData) => {
+            // 轮询完成回调
+            handleSearch(searchTerm, parseInt(pagination.current, 10) || 1, parseInt(pagination.pageSize, 10) || 10);
+          });
+        } else {
+          console.warn('无法从API响应中获取report_id:', result.data);
+          message.warning('报告生成已启动，但无法获取报告ID进行状态轮询');
+        }
+
         // 刷新数据
         handleSearch(searchTerm, parseInt(pagination.current, 10) || 1, parseInt(pagination.pageSize, 10) || 10);
       } else {
@@ -173,6 +190,7 @@ const OrthoK = () => {
         }
       }
     } catch (error) {
+      console.error('生成综合报告时发生错误:', error);
       message.error('生成综合报告失败，请重试');
     } finally {
       setActionLoading(prev => ({ ...prev, [`report_${record.visit_id}`]: false }));
