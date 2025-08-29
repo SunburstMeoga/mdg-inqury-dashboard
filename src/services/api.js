@@ -880,8 +880,11 @@ class ApiService {
       // 确保传递给API的是字符串类型
       const visitIdStr = typeof visitId === 'string' ? visitId : String(visitId);
 
+      // 为AI分析请求创建特殊的配置，延长超时时间到5分钟
       const response = await apiClient.post('/pacs-records/trigger-ai-analysis', {
         visit_id: visitIdStr
+      }, {
+        timeout: 300000 // 5分钟超时
       });
 
       return {
@@ -915,7 +918,10 @@ class ApiService {
       }
 
       console.log('发送生成综合报告请求:', requestData);
-      const response = await apiClient.post('/pacs-records/generate-comprehensive-report', requestData);
+      // 为生成综合报告请求创建特殊的配置，延长超时时间到5分钟
+      const response = await apiClient.post('/pacs-records/generate-comprehensive-report', requestData, {
+        timeout: 300000 // 5分钟超时
+      });
       console.log('生成综合报告API响应:', response.data);
 
       return {
