@@ -50,25 +50,50 @@
     margin: 1px;
   }
 
-  /* 操作列移动端宽度优化 */
-  .consultations-table .ant-table-cell-fix-right {
-    width: 90px !important;
-    min-width: 90px !important;
+  /* 操作列移动端宽度优化 - 统一所有表格的操作列宽度 */
+  .consultations-table .ant-table-cell-fix-right,
+  .consultations-table .ant-table-cell-fix-right-first,
+  .consultations-table .ant-table-cell-fix-right-last,
+  .reports-table .ant-table-cell-fix-right,
+  .reports-table .ant-table-cell-fix-right-first,
+  .reports-table .ant-table-cell-fix-right-last,
+  .analysis-table .ant-table-cell-fix-right,
+  .analysis-table .ant-table-cell-fix-right-first,
+  .analysis-table .ant-table-cell-fix-right-last {
+    width: 85px !important;
+    min-width: 85px !important;
+    max-width: 85px !important;
   }
 
-  .analysis-table .ant-table-cell-fix-right {
-    width: 110px !important;
-    min-width: 110px !important;
+  /* 更强的选择器优先级 - 针对操作列的th和td - 统一所有表格 */
+  .consultations-table .ant-table-thead > tr > th:last-child,
+  .consultations-table .ant-table-tbody > tr > td:last-child,
+  .reports-table .ant-table-thead > tr > th:last-child,
+  .reports-table .ant-table-tbody > tr > td:last-child,
+  .analysis-table .ant-table-thead > tr > th:last-child,
+  .analysis-table .ant-table-tbody > tr > td:last-child {
+    width: 85px !important;
+    min-width: 85px !important;
+    max-width: 85px !important;
   }
 
   /* 操作列内容垂直排列 - 使用ResponsiveActionColumn */
   .consultations-table .ant-table-cell-fix-right .responsive-action-column.mobile,
+  .reports-table .ant-table-cell-fix-right .responsive-action-column.mobile,
   .analysis-table .ant-table-cell-fix-right .responsive-action-column.mobile {
     width: 100%;
     align-items: stretch;
   }
 
+  /* 强制覆盖Ant Design的固定列宽度 - 统一所有表格 */
+  .consultations-table .ant-table-container .ant-table-content table colgroup col:last-child,
+  .reports-table .ant-table-container .ant-table-content table colgroup col:last-child,
+  .analysis-table .ant-table-container .ant-table-content table colgroup col:last-child {
+    width: 85px !important;
+  }
+
   .consultations-table .ant-table-cell-fix-right .responsive-action-column.mobile .ant-btn,
+  .reports-table .ant-table-cell-fix-right .responsive-action-column.mobile .ant-btn,
   .analysis-table .ant-table-cell-fix-right .responsive-action-column.mobile .ant-btn {
     width: 100%;
     margin-bottom: 4px;
@@ -79,12 +104,14 @@
   }
 
   .consultations-table .ant-table-cell-fix-right .responsive-action-column.mobile .ant-btn:last-child,
+  .reports-table .ant-table-cell-fix-right .responsive-action-column.mobile .ant-btn:last-child,
   .analysis-table .ant-table-cell-fix-right .responsive-action-column.mobile .ant-btn:last-child {
     margin-bottom: 0;
   }
 
   /* 操作列按钮图标调整 */
   .consultations-table .ant-table-cell-fix-right .responsive-action-column.mobile .ant-btn .anticon,
+  .reports-table .ant-table-cell-fix-right .responsive-action-column.mobile .ant-btn .anticon,
   .analysis-table .ant-table-cell-fix-right .responsive-action-column.mobile .ant-btn .anticon {
     font-size: 11px;
   }
