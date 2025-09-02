@@ -89,20 +89,74 @@
 }
 
 /* 响应式设计 */
-@media (max-width: 768px) {
+/* 平板端样式 (768px - 991px) */
+@media (max-width: 991px) {
   .app-header {
     padding: 0 16px;
   }
 
+  /* 隐藏项目标题，只保留logo */
   .header-title {
-    font-size: 16px;
+    display: none;
   }
 
+  /* 隐藏机构信息 */
   .organization-info {
     display: none;
   }
 
+  /* 保持用户详情显示 */
   .user-details {
+    display: flex;
+  }
+
+  /* 调整logo大小 */
+  .header-logo {
+    max-width: 36px;
+    max-height: 36px;
+  }
+}
+
+/* 手机端样式 (< 768px) */
+@media (max-width: 767px) {
+  .app-header {
+    padding: 0 12px;
+  }
+
+  /* 隐藏项目标题，只保留logo */
+  .header-title {
     display: none;
+  }
+
+  /* 隐藏机构信息 */
+  .organization-info {
+    display: none;
+  }
+
+  /* 保持用户详情显示 */
+  .user-details {
+    display: flex;
+  }
+
+  /* 调整logo大小 */
+  .header-logo {
+    max-width: 32px;
+    max-height: 32px;
+    margin-right: 8px;
+  }
+
+  /* 调整用户信息字体大小 */
+  .user-name {
+    font-size: 13px;
+  }
+
+  .user-role {
+    font-size: 11px;
+  }
+
+  /* 调整头像大小 */
+  .user-avatar-container .ant-avatar {
+    width: 28px !important;
+    height: 28px !important;
   }
 }
