@@ -267,32 +267,6 @@ const Doctors = () => {
       title: '创建时间',
       dataIndex: 'created_at',
       key: 'created_at',
-      width: 150,
-      render: (text) => {
-        if (!text) return '-';
-        return new Date(text).toLocaleString('zh-CN');
-      }
-    },
-    {
-      title: '角色',
-      key: 'role',
-      width: 100,
-      render: (_, record) => {
-        if (record.is_admin) {
-          return <Tag color="blue">管理员</Tag>;
-        }
-        const userType = record.user_type || 'doctor';
-        return (
-          <Tag color={userType === 'counselor' ? 'green' : 'default'}>
-            {userType === 'counselor' ? '咨询师' : '医生'}
-          </Tag>
-        );
-      }
-    },
-    {
-      title: '创建时间',
-      dataIndex: 'created_at',
-      key: 'created_at',
       width: 160,
       render: (text) => formatDate(text)
     },
@@ -422,7 +396,7 @@ const Doctors = () => {
           dataSource={doctors}
           rowKey="id"
           loading={loading}
-          scroll={{ x: 1000 }}
+          scroll={{ x: 900 }}
           pagination={{
             current: pagination.current,
             pageSize: pagination.pageSize,

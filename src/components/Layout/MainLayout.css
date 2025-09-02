@@ -40,3 +40,23 @@
 .main-content::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
 }
+
+/* 响应式设计 */
+/* 手机端样式 */
+@media (max-width: 767px) {
+  .main-content-layout {
+    /* 手机端没有侧边栏，内容占满全宽 */
+    height: calc(100vh - 64px);
+  }
+
+  .content-wrapper {
+    padding: 16px;
+  }
+}
+
+/* 平板端样式 */
+@media (max-width: 991px) and (min-width: 768px) {
+  .content-wrapper {
+    padding: 20px;
+  }
+}

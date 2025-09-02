@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Layout, Avatar, Dropdown, Space, Typography, Modal, message } from 'antd';
-import { UserOutlined, LogoutOutlined, LockOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { Layout, Avatar, Dropdown, Space, Typography, Modal, message, Button } from 'antd';
+import { UserOutlined, LogoutOutlined, LockOutlined, InfoCircleOutlined, MenuOutlined } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
 import { PROJECT_NAME, LOGO_URL, ORGANIZATION_TYPES } from '../../utils/constants';
 import ChangePassword from '../ChangePassword/ChangePassword';
@@ -9,7 +9,7 @@ import './Header.css';
 const { Header: AntHeader } = Layout;
 const { Text } = Typography;
 
-const Header = () => {
+const Header = ({ onMenuClick, isMobile }) => {
   const { user, logout, isAdmin } = useAuth();
   const [changePasswordVisible, setChangePasswordVisible] = useState(false);
 
@@ -62,6 +62,14 @@ const Header = () => {
     <>
       <AntHeader className="app-header">
         <div className="header-left">
+          {isMobile && (
+            <Button
+              type="text"
+              icon={<MenuOutlined />}
+              onClick={onMenuClick}
+              className="mobile-menu-button"
+            />
+          )}
           <img src={LOGO_URL} alt="Logo" className="header-logo" />
           <span className="header-title">{PROJECT_NAME}</span>
         </div>

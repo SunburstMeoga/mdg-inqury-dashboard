@@ -88,6 +88,23 @@
   line-height: 1.2;
 }
 
+/* 移动端菜单按钮 */
+.mobile-menu-button {
+  margin-right: 12px;
+  color: #004EA2;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+.mobile-menu-button:hover {
+  background-color: #f0f7ff;
+  color: #0066CC;
+}
+
 /* 响应式设计 */
 /* 平板端样式 (768px - 991px) */
 @media (max-width: 991px) {
@@ -123,8 +140,13 @@
     padding: 0 12px;
   }
 
-  /* 隐藏项目标题，只保留logo */
+  /* 隐藏项目标题 */
   .header-title {
+    display: none;
+  }
+
+  /* 隐藏logo，为汉堡菜单让出空间 */
+  .header-logo {
     display: none;
   }
 
@@ -136,13 +158,6 @@
   /* 保持用户详情显示 */
   .user-details {
     display: flex;
-  }
-
-  /* 调整logo大小 */
-  .header-logo {
-    max-width: 32px;
-    max-height: 32px;
-    margin-right: 8px;
   }
 
   /* 调整用户信息字体大小 */
@@ -158,5 +173,10 @@
   .user-avatar-container .ant-avatar {
     width: 28px !important;
     height: 28px !important;
+  }
+
+  /* 调整移动端菜单按钮样式 */
+  .mobile-menu-button {
+    margin-right: 0;
   }
 }

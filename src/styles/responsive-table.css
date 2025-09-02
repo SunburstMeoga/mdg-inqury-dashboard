@@ -1,0 +1,190 @@
+/* 响应式表格通用样式 */
+
+/* 表格容器响应式 */
+.table-card {
+  overflow: hidden;
+}
+
+/* 表格响应式样式 */
+.ant-table-wrapper {
+  /* 确保表格容器能够正确处理滚动 */
+  overflow: auto;
+}
+
+/* 移动端表格优化 */
+@media (max-width: 767px) {
+  /* 表格卡片内边距调整 */
+  .table-card .ant-card-body {
+    padding: 12px;
+  }
+
+  /* 表格字体大小调整 */
+  .ant-table {
+    font-size: 12px;
+  }
+
+  /* 表格头部样式 */
+  .ant-table-thead > tr > th {
+    padding: 8px 4px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  /* 表格单元格样式 */
+  .ant-table-tbody > tr > td {
+    padding: 8px 4px;
+    font-size: 12px;
+  }
+
+  /* 操作按钮样式调整 */
+  .ant-table-tbody .ant-btn {
+    font-size: 11px;
+    height: 28px;
+    padding: 0 8px;
+  }
+
+  /* 标签样式调整 */
+  .ant-table-tbody .ant-tag {
+    font-size: 11px;
+    padding: 0 4px;
+    margin: 1px;
+  }
+
+  /* 分页器样式调整 */
+  .ant-pagination {
+    margin-top: 16px;
+  }
+
+  .ant-pagination-options {
+    display: none;
+  }
+
+  .ant-pagination-total-text {
+    display: none;
+  }
+
+  /* 隐藏快速跳转 */
+  .ant-pagination-options-quick-jumper {
+    display: none;
+  }
+}
+
+/* 平板端表格优化 */
+@media (max-width: 991px) and (min-width: 768px) {
+  /* 表格卡片内边距调整 */
+  .table-card .ant-card-body {
+    padding: 16px;
+  }
+
+  /* 表格字体大小调整 */
+  .ant-table {
+    font-size: 13px;
+  }
+
+  /* 表格头部样式 */
+  .ant-table-thead > tr > th {
+    padding: 10px 6px;
+    font-size: 13px;
+  }
+
+  /* 表格单元格样式 */
+  .ant-table-tbody > tr > td {
+    padding: 10px 6px;
+    font-size: 13px;
+  }
+
+  /* 操作按钮样式调整 */
+  .ant-table-tbody .ant-btn {
+    font-size: 12px;
+    height: 30px;
+    padding: 0 10px;
+  }
+
+  /* 标签样式调整 */
+  .ant-table-tbody .ant-tag {
+    font-size: 12px;
+    padding: 0 6px;
+  }
+}
+
+/* 表格滚动条样式优化 */
+.ant-table-body::-webkit-scrollbar {
+  height: 6px;
+}
+
+.ant-table-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.ant-table-body::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.ant-table-body::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* 固定列阴影优化 */
+.ant-table-ping-right .ant-table-cell-fix-right-first::after {
+  box-shadow: inset 10px 0 8px -8px rgba(0, 0, 0, 0.15);
+}
+
+/* 空状态响应式 */
+@media (max-width: 767px) {
+  .ant-empty {
+    margin: 20px 0;
+  }
+
+  .ant-empty-description {
+    font-size: 12px;
+  }
+}
+
+/* 搜索和筛选区域响应式 */
+@media (max-width: 767px) {
+  .filter-card .ant-card-body,
+  .search-card .ant-card-body {
+    padding: 12px;
+  }
+
+  .filter-container,
+  .search-container {
+    gap: 8px;
+  }
+
+  .filter-container .ant-space,
+  .search-container .ant-space {
+    gap: 8px !important;
+  }
+
+  /* 搜索输入框调整 */
+  .search-input {
+    width: 100% !important;
+  }
+
+  /* 按钮组调整 */
+  .ant-space-item .ant-btn {
+    font-size: 12px;
+    height: 32px;
+    padding: 0 12px;
+  }
+
+  /* 选择器调整 */
+  .ant-select {
+    min-width: 100px;
+  }
+}
+
+/* 平板端搜索和筛选区域 */
+@media (max-width: 991px) and (min-width: 768px) {
+  .filter-card .ant-card-body,
+  .search-card .ant-card-body {
+    padding: 16px;
+  }
+
+  .search-input {
+    width: 280px !important;
+  }
+}

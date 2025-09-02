@@ -42,6 +42,79 @@
   background-color: #0066CC !important;
 }
 
+/* 移动端抽屉样式 */
+.mobile-sidebar-drawer .ant-drawer-header {
+  background-color: #004EA2;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.mobile-sidebar-drawer .ant-drawer-title {
+  color: white;
+}
+
+.mobile-drawer-header {
+  display: flex;
+  align-items: center;
+  color: white;
+}
+
+.mobile-drawer-logo {
+  width: 32px;
+  height: 32px;
+  margin-right: 12px;
+  object-fit: contain;
+}
+
+.mobile-drawer-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+}
+
+/* 移动端菜单样式 */
+.mobile-sidebar-menu {
+  border-right: none;
+  padding-top: 16px;
+}
+
+.mobile-sidebar-menu .ant-menu-item {
+  margin: 4px 16px;
+  border-radius: 6px;
+  height: 48px;
+  line-height: 48px;
+  display: flex;
+  align-items: center;
+}
+
+.mobile-sidebar-menu .ant-menu-item:hover {
+  background-color: #f0f7ff;
+  color: #004EA2;
+}
+
+.mobile-sidebar-menu .ant-menu-item-selected {
+  background-color: #004EA2 !important;
+  color: white !important;
+}
+
+.mobile-sidebar-menu .ant-menu-item-selected:hover {
+  background-color: #0066CC !important;
+}
+
+/* 响应式设计 */
+/* 平板端样式 */
+@media (max-width: 991px) and (min-width: 768px) {
+  .app-sidebar {
+    /* 平板端保持侧边栏显示，但默认折叠 */
+  }
+}
+
+/* 手机端隐藏侧边栏 */
+@media (max-width: 767px) {
+  .app-sidebar {
+    display: none !important;
+  }
+}
+
 .sidebar-menu .ant-menu-item-selected .anticon {
   color: white;
 }
