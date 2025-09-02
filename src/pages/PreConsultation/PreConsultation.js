@@ -22,6 +22,7 @@ import {
   UserOutlined
 } from '@ant-design/icons';
 import ApiService from '../../services/api';
+import ResponsiveActionColumn from '../../components/ResponsiveActionColumn/ResponsiveActionColumn';
 import './PreConsultation.css';
 
 const { Search } = Input;
@@ -198,19 +199,21 @@ const PreConsultation = () => {
     {
       title: '操作',
       key: 'action',
-      width: 100,
+      width: 85,
       fixed: 'right',
       render: (_, record) => (
-        <Tooltip title="下载报告">
-          <Button
-            type="primary"
-            icon={<DownloadOutlined />}
-            size="small"
-            onClick={() => handleDownload(record)}
-          >
-            下载
-          </Button>
-        </Tooltip>
+        <ResponsiveActionColumn>
+          <Tooltip title="下载报告">
+            <Button
+              type="primary"
+              icon={<DownloadOutlined />}
+              size="small"
+              onClick={() => handleDownload(record)}
+            >
+              下载
+            </Button>
+          </Tooltip>
+        </ResponsiveActionColumn>
       )
     }
   ];

@@ -472,31 +472,29 @@ const PreSurgery = () => {
             );
           } else if (comprehensiveReport.status === 'completed') {
             // status = "completed"：显示下载报告和重新生成报告按钮
-            return (
-              <Space size="small">
-                <Tooltip title="下载报告">
-                  <Button
-                    type="primary"
-                    icon={<DownloadOutlined />}
-                    size="small"
-                    onClick={() => handleDownloadReport(record)}
-                  >
-                    下载报告
-                  </Button>
-                </Tooltip>
-                <Tooltip title="重新生成报告">
-                  <Button
-                    type="default"
-                    icon={<ReloadOutlined />}
-                    size="small"
-                    loading={actionLoading[`report_${record.visit_id}`]}
-                    onClick={() => handleRegenerateReport(record)}
-                  >
-                    重新生成
-                  </Button>
-                </Tooltip>
-              </Space>
-            );
+            return [
+              <Tooltip key="download" title="下载报告">
+                <Button
+                  type="primary"
+                  icon={<DownloadOutlined />}
+                  size="small"
+                  onClick={() => handleDownloadReport(record)}
+                >
+                  下载报告
+                </Button>
+              </Tooltip>,
+              <Tooltip key="regenerate" title="重新生成报告">
+                <Button
+                  type="default"
+                  icon={<ReloadOutlined />}
+                  size="small"
+                  loading={actionLoading[`report_${record.visit_id}`]}
+                  onClick={() => handleRegenerateReport(record)}
+                >
+                  重新生成
+                </Button>
+              </Tooltip>
+            ];
           } else if (comprehensiveReport.status === 'processing') {
             // status = "processing"：显示查询状态按钮
             return (

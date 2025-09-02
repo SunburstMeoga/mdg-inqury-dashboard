@@ -18,14 +18,21 @@
   width: 100%;
 }
 
-.responsive-action-column.mobile .ant-btn {
+/* 移动端多个按钮时的样式 */
+.responsive-action-column.mobile .ant-space-vertical .ant-btn {
   width: 100%;
   margin-bottom: 4px;
   justify-content: center;
 }
 
-.responsive-action-column.mobile .ant-btn:last-child {
+.responsive-action-column.mobile .ant-space-vertical .ant-btn:last-child {
   margin-bottom: 0;
+}
+
+/* 移动端单个按钮时的样式 */
+.responsive-action-column.mobile .ant-space-horizontal .ant-btn {
+  width: 100%;
+  justify-content: center;
 }
 
 /* 移动端按钮文字调整 */
@@ -35,8 +42,23 @@
     height: 28px;
     padding: 0 8px;
   }
-  
+
   .responsive-action-column.mobile .ant-btn .anticon {
     font-size: 12px;
+  }
+
+  /* 确保垂直排列时按钮样式正确 */
+  .responsive-action-column.mobile .ant-space-vertical .ant-btn {
+    width: 100%;
+    margin-bottom: 4px;
+  }
+
+  .responsive-action-column.mobile .ant-space-vertical .ant-btn:last-child {
+    margin-bottom: 0;
+  }
+
+  /* 确保水平排列时按钮样式正确 */
+  .responsive-action-column.mobile .ant-space-horizontal .ant-btn {
+    width: 100%;
   }
 }
