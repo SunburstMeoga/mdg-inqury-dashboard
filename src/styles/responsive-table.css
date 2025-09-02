@@ -50,6 +50,45 @@
     margin: 1px;
   }
 
+  /* 操作列移动端宽度优化 */
+  .consultations-table .ant-table-cell-fix-right {
+    width: 90px !important;
+    min-width: 90px !important;
+  }
+
+  .analysis-table .ant-table-cell-fix-right {
+    width: 110px !important;
+    min-width: 110px !important;
+  }
+
+  /* 操作列内容垂直排列 - 使用ResponsiveActionColumn */
+  .consultations-table .ant-table-cell-fix-right .responsive-action-column.mobile,
+  .analysis-table .ant-table-cell-fix-right .responsive-action-column.mobile {
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .consultations-table .ant-table-cell-fix-right .responsive-action-column.mobile .ant-btn,
+  .analysis-table .ant-table-cell-fix-right .responsive-action-column.mobile .ant-btn {
+    width: 100%;
+    margin-bottom: 4px;
+    justify-content: center;
+    font-size: 10px;
+    height: 26px;
+    padding: 0 6px;
+  }
+
+  .consultations-table .ant-table-cell-fix-right .responsive-action-column.mobile .ant-btn:last-child,
+  .analysis-table .ant-table-cell-fix-right .responsive-action-column.mobile .ant-btn:last-child {
+    margin-bottom: 0;
+  }
+
+  /* 操作列按钮图标调整 */
+  .consultations-table .ant-table-cell-fix-right .responsive-action-column.mobile .ant-btn .anticon,
+  .analysis-table .ant-table-cell-fix-right .responsive-action-column.mobile .ant-btn .anticon {
+    font-size: 11px;
+  }
+
   /* 分页器样式调整 */
   .ant-pagination {
     margin-top: 16px;

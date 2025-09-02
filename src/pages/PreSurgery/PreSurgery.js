@@ -39,6 +39,7 @@ import {
 } from '../../utils/constants';
 import useReportPolling from '../../hooks/useReportPolling';
 import ProgressTimer from '../../components/ProgressTimer/ProgressTimer';
+import ResponsiveActionColumn from '../../components/ResponsiveActionColumn/ResponsiveActionColumn';
 import './PreSurgery.css';
 
 const { Search } = Input;
@@ -429,7 +430,7 @@ const PreSurgery = () => {
     {
       title: '操作',
       key: 'action',
-      width: 250,
+      width: 200,
       fixed: 'right',
       render: (_, record) => {
         const canTriggerAi = canTriggerAiAnalysis(record.records);
@@ -516,24 +517,22 @@ const PreSurgery = () => {
         };
 
         return (
-          <Space size="small" direction="vertical">
-            <Space size="small">
-              {canTriggerAi && (
-                <Tooltip title="触发AI分析">
-                  <Button
-                    type="primary"
-                    icon={<ExperimentOutlined />}
-                    size="small"
-                    loading={actionLoading[`ai_${record.visit_id}`]}
-                    onClick={() => handleTriggerAiAnalysis(record)}
-                  >
-                    AI分析
-                  </Button>
-                </Tooltip>
-              )}
-              {renderReportButtons()}
-            </Space>
-          </Space>
+          <ResponsiveActionColumn>
+            {canTriggerAi && (
+              <Tooltip title="触发AI分析">
+                <Button
+                  type="primary"
+                  icon={<ExperimentOutlined />}
+                  size="small"
+                  loading={actionLoading[`ai_${record.visit_id}`]}
+                  onClick={() => handleTriggerAiAnalysis(record)}
+                >
+                  AI分析
+                </Button>
+              </Tooltip>
+            )}
+            {renderReportButtons()}
+          </ResponsiveActionColumn>
         );
       }
     }

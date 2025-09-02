@@ -1,0 +1,42 @@
+/* 响应式操作列样式 */
+.responsive-action-column {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* 桌面端样式 */
+.responsive-action-column.desktop {
+  flex-direction: row;
+  align-items: center;
+}
+
+/* 移动端样式 */
+.responsive-action-column.mobile {
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+}
+
+.responsive-action-column.mobile .ant-btn {
+  width: 100%;
+  margin-bottom: 4px;
+  justify-content: center;
+}
+
+.responsive-action-column.mobile .ant-btn:last-child {
+  margin-bottom: 0;
+}
+
+/* 移动端按钮文字调整 */
+@media (max-width: 767px) {
+  .responsive-action-column.mobile .ant-btn {
+    font-size: 11px;
+    height: 28px;
+    padding: 0 8px;
+  }
+  
+  .responsive-action-column.mobile .ant-btn .anticon {
+    font-size: 12px;
+  }
+}

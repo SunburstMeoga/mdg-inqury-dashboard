@@ -11,7 +11,8 @@ import {
   message,
   Modal,
   Typography,
-  Image
+  Image,
+  Grid
 } from 'antd';
 import {
   DownloadOutlined,
@@ -24,6 +25,7 @@ import {
   PAGINATION_CONFIG,
   DATE_FORMATS
 } from '../../utils/constants';
+import ResponsiveActionColumn from '../../components/ResponsiveActionColumn/ResponsiveActionColumn';
 import './Consultations.css';
 
 const { Search } = Input;
@@ -275,7 +277,7 @@ const Consultations = () => {
       width: 160,
       fixed: 'right',
       render: (_, record) => (
-        <Space size="small">
+        <ResponsiveActionColumn>
           {record.is_fetched ? (
             <Button
               type="primary"
@@ -296,7 +298,7 @@ const Consultations = () => {
               获取报告
             </Button>
           )}
-        </Space>
+        </ResponsiveActionColumn>
       )
     }
   ];
