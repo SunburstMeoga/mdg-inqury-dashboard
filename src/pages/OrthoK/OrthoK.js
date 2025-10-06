@@ -24,7 +24,9 @@ import {
   FileTextOutlined,
   ExperimentOutlined,
   DownloadOutlined,
-  ReloadOutlined
+  ReloadOutlined,
+  FileTextTwoTone,
+  EyeTwoTone
 } from '@ant-design/icons';
 import ApiService from '../../services/api';
 import {
@@ -40,6 +42,7 @@ import {
 import useReportPolling from '../../hooks/useReportPolling';
 import ProgressTimer from '../../components/ProgressTimer/ProgressTimer';
 import ResponsiveActionColumn from '../../components/ResponsiveActionColumn/ResponsiveActionColumn';
+import DataPreviewModal from '../../components/DataPreviewModal/DataPreviewModal';
 import './OrthoK.css';
 
 const { Search } = Input;
@@ -58,6 +61,10 @@ const OrthoK = () => {
     totalGroups: 0,
     totalRecords: 0
   });
+  const [previewModalVisible, setPreviewModalVisible] = useState(false);
+  const [previewData, setPreviewData] = useState([]);
+  const [previewTitle, setPreviewTitle] = useState('');
+  const [previewLoading, setPreviewLoading] = useState(false);
 
   // 使用报告轮询Hook
   const {
@@ -335,6 +342,30 @@ const OrthoK = () => {
 
     return `总计${records.length}项 (未处理:${pending}, 处理中:${processing}, 已完成:${finished})`;
   };
+  
+  // 处理文字数据预览
+  const handleTextDataPreview = (record) => {
+    if (!record.exam_data || record.exam_data.length === 0) {
+      message.info('暂无文字数据');
+      return;
+    }
+    
+    setPreviewTitle(`${record.outpatient_number} - 文字数据`);
+    setPreviewData(record.exam_data);
+    setPreviewModalVisible(true);
+  };
+
+  // 处理在线预览
+  const handleOnlinePreview = (record) => {
+    if (!record.ophthalmology_data || record.ophthalmology_data.length === 0) {
+      message.info('暂无在线预览数据');
+      return;
+    }
+    
+    setPreviewTitle(`${record.outpatient_number} - 在线预览`);
+    setPreviewData(record.ophthalmology_data);
+    setPreviewModalVisible(true);
+  };
 
   // 表格列定义
   const columns = [
@@ -426,6 +457,36 @@ const OrthoK = () => {
           </div>
         );
       }
+    },
+    {
+      title: '文字数据',
+      key: 'text_data',
+      width: 100,
+      render: (_, record) => (
+        <Button 
+          type="link" 
+          icon={<FileTextTwoTone />} 
+          onClick={() => handleTextDataPreview(record)}
+          disabled={!record.exam_data || record.exam_data.length === 0}
+        >
+          查看
+        </Button>
+      )
+    },
+    {
+      title: '在线预览',
+      key: 'online_preview',
+      width: 100,
+      render: (_, record) => (
+        <Button 
+          type="link" 
+          icon={<EyeTwoTone />} 
+          onClick={() => handleOnlinePreview(record)}
+          disabled={!record.ophthalmology_data || record.ophthalmology_data.length === 0}
+        >
+          预览
+        </Button>
+      )
     },
     {
       title: '操作',
@@ -601,6 +662,15 @@ const OrthoK = () => {
           }}
           onChange={handleTableChange}
           className="analysis-table"
+        />
+        
+        {/* 数据预览Modal */}
+        <DataPreviewModal
+          visible={previewModalVisible}
+          onClose={() => setPreviewModalVisible(false)}
+          data={previewData}
+          title={previewTitle}
+          loading={previewLoading}
         />
       </Card>
     </div>
