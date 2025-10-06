@@ -23,3 +23,19 @@
 .ant-descriptions-bordered .ant-descriptions-item-content {
   word-break: break-all;
 }
+
+/* 格式化数据列表样式 */
+.formatted-data-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formatted-data-item {
+  padding: 6px 10px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}

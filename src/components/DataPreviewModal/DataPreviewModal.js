@@ -30,11 +30,31 @@ const DataPreviewModal = ({ visible, onClose, data, title, loading }) => {
           <div key={index} className="preview-item">
             <Divider orientation="left">数据项 {index + 1}</Divider>
             <Descriptions bordered column={1} size="small">
-              {Object.entries(item).map(([key, value]) => (
-                <Descriptions.Item key={key} label={key}>
-                  {typeof value === 'object' ? JSON.stringify(value) : String(value)}
-                </Descriptions.Item>
-              ))}
+              {/* 处理所有普通字段 */}
+              {Object.entries(item).map(([key, value]) => {
+                // 特殊处理 formatted_data 字段
+                if (key === 'formatted_data' && Array.isArray(value)) {
+                  return (
+                    <Descriptions.Item key={key} label="格式化数据">
+                      <div className="formatted-data-list">
+                        {value.map((formattedItem, fIndex) => (
+                          <div key={fIndex} className="formatted-data-item">
+                            <Text strong>{formattedItem.name}: </Text>
+                            <Text>{formattedItem.value}</Text>
+                            {formattedItem.unit && <Text type="secondary"> {formattedItem.unit}</Text>}
+                          </div>
+                        ))}
+                      </div>
+                    </Descriptions.Item>
+                  );
+                }
+                // 处理其他普通字段
+                return (
+                  <Descriptions.Item key={key} label={key}>
+                    {typeof value === 'object' && value !== null ? JSON.stringify(value) : String(value)}
+                  </Descriptions.Item>
+                );
+              })}
             </Descriptions>
           </div>
         ))}
